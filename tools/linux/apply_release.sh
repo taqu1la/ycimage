@@ -103,5 +103,14 @@ nginx -t
 systemctl enable nginx
 systemctl restart nginx
 
-curl -fsS "http://${APP_HOST}:${APP_PORT}/api/health" >/dev/null
+for attempt in $(seq 1 30); do
+  if curl -fsS "http://${APP_HOST}:${APP_PORT}/api/health" >/dev/null; then
+    break
+  fi
+  if [[ "$attempt" == "30" ]]; then
+    echo "YCImage health check failed at http://${APP_HOST}:${APP_PORT}/api/health" >&2
+    exit 1
+  fi
+  sleep 1
+done
 echo "YCImage is healthy at http://${APP_HOST}:${APP_PORT}/api/health"
