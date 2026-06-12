@@ -30,9 +30,9 @@ jobs:
         run: |
           set -euo pipefail
           install -d -m 700 ~/.ssh
-          cat <<'EOF' > ~/.ssh/id_ed25519
-          ${{ secrets.ECS_SSH_KEY }}
-          EOF
+          cat > ~/.ssh/id_ed25519 <<'EOF'
+${{ secrets.ECS_SSH_KEY }}
+EOF
           chmod 600 ~/.ssh/id_ed25519
           ECS_PORT="${{ secrets.ECS_PORT }}"
           if [ -z "$ECS_PORT" ]; then
@@ -57,13 +57,16 @@ jobs:
             ./ "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}:/opt/ycimage/current/"
 
       - name: Upload runtime env file
-        if: ${{ secrets.YCIMAGE_ENV_FILE != '' }}
         shell: bash
+        env:
+          YCIMAGE_ENV_FILE_SECRET: ${{ secrets.YCIMAGE_ENV_FILE }}
         run: |
           set -euo pipefail
-          cat <<'EOF' > /tmp/ycimage.env
-          ${{ secrets.YCIMAGE_ENV_FILE }}
-          EOF
+          if [ -z "$YCIMAGE_ENV_FILE_SECRET" ]; then
+            echo "YCIMAGE_ENV_FILE secret is empty; using existing /etc/ycimage/ycimage.env on ECS."
+            exit 0
+          fi
+          printf '%s\n' "$YCIMAGE_ENV_FILE_SECRET" > /tmp/ycimage.env
           scp -P "$ECS_PORT" -i ~/.ssh/id_ed25519 /tmp/ycimage.env "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}:/etc/ycimage/ycimage.env"
           ssh -p "$ECS_PORT" -i ~/.ssh/id_ed25519 "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}" "chmod 600 /etc/ycimage/ycimage.env"
 
