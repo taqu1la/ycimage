@@ -1,8 +1,35 @@
 node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .DS_Store
+Thumbs.db
 *.log
 .env
+.env.*
+.env.local
+.env.local.*
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# Local runtime and test artifacts
+.codex-temp/
+.external/
+.playwright-cli/
+
+# Python virtual environments
+.venv/
+venv/
+
+# Local SQLite data and WAL files
+backend/data/*.db
+backend/data/*.db-shm
+backend/data/*.db-wal
+backend/data/*.sqlite
+backend/data/*.sqlite3
+
+# Local server-side runtime copies
+backups/

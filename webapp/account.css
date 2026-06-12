@@ -1,0 +1,672 @@
+.account-page {
+    min-height: 100dvh;
+    background:
+        linear-gradient(180deg, rgba(247, 249, 252, 0.96), rgba(255, 255, 255, 0.98)),
+        var(--bg);
+}
+
+.account-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 0 max(24px, calc((100vw - var(--max)) / 2));
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(18px);
+}
+
+.account-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.account-shell {
+    width: min(1420px, calc(100% - 44px));
+    margin: 28px auto 72px;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 24px;
+}
+
+.account-sidebar {
+    position: sticky;
+    top: 94px;
+    align-self: start;
+    display: grid;
+    gap: 14px;
+}
+
+.account-user-card,
+.account-panel,
+.invite-card,
+.account-login-required {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: var(--shadow-soft);
+}
+
+.account-user-card {
+    padding: 18px;
+}
+
+.account-avatar {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    border-radius: 13px;
+    background: var(--black);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.account-user-card span,
+.account-user-card small,
+.account-panel span,
+.invite-card span,
+.metric-grid span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.account-user-card strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 1.24;
+    font-weight: 740;
+}
+
+.account-user-card small {
+    display: block;
+    margin-top: 5px;
+    line-height: 1.55;
+    font-size: 11px;
+    font-weight: 540;
+}
+
+.account-menu {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.account-menu button {
+    min-height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    text-align: left;
+    font-size: 12px;
+    font-weight: 660;
+    letter-spacing: 0.01em;
+    padding: 0 12px;
+}
+
+.account-menu button:hover,
+.account-menu button.active {
+    background: var(--black);
+    color: #fff;
+}
+
+.account-main {
+    min-width: 0;
+}
+
+.account-hero {
+    min-height: 210px;
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: flex-end;
+    padding: 34px;
+    border-radius: 22px;
+    color: #fff;
+    background:
+        linear-gradient(135deg, rgba(9, 13, 26, 0.96), rgba(36, 41, 58, 0.94)),
+        url("assets/awesome-gpt-image-2/data/images/case475.jpg") center/cover;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.account-hero h1 {
+    margin: 0;
+    max-width: 680px;
+    font-size: clamp(26px, 3vw, 42px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    font-weight: 760;
+    text-wrap: balance;
+}
+
+.account-hero p:not(.eyebrow) {
+    max-width: 640px;
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 14px;
+    line-height: 1.68;
+}
+
+.account-hero .eyebrow {
+    color: #9bf2b1;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.08em;
+}
+
+.account-hero-actions {
+    display: flex;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.account-hero-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #fff;
+}
+
+.account-login-required {
+    display: grid;
+    place-items: start;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 28px;
+}
+
+.account-login-required[hidden],
+.account-content[hidden] {
+    display: none !important;
+}
+
+.account-login-required h2,
+.account-login-required p {
+    margin: 0;
+}
+
+.account-login-required p,
+.muted-copy {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.account-content {
+    margin-top: 18px;
+}
+
+.account-view {
+    display: none;
+}
+
+.account-view.active {
+    display: block;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.metric-grid article {
+    min-height: 122px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.metric-grid strong {
+    display: block;
+    margin-top: 10px;
+    font-size: clamp(21px, 2vw, 27px);
+    line-height: 1.05;
+    font-weight: 740;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.metric-grid small {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.overview-grid,
+.invite-layout,
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.account-panel {
+    min-width: 0;
+    padding: 20px;
+}
+
+.panel-span-2 {
+    grid-column: 1 / -1;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.panel-heading.standalone {
+    margin: 0 0 16px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.panel-heading h2 {
+    margin: 4px 0 0;
+    font-size: 18px;
+    line-height: 1.24;
+    letter-spacing: -0.01em;
+    font-weight: 760;
+}
+
+.panel-heading button {
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.compact-list,
+.work-history,
+.ledger-table,
+.order-list {
+    display: grid;
+    gap: 10px;
+}
+
+.list-row,
+.work-row,
+.ledger-row,
+.order-row {
+    display: grid;
+    gap: 7px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-warm);
+}
+
+.list-row-top,
+.ledger-row,
+.order-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.list-row strong,
+.work-row strong,
+.order-row strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 720;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list-row small,
+.work-row small,
+.ledger-row small,
+.order-row small {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.status-pill,
+.amount-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #eef2f8;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.status-success,
+.amount-credit {
+    background: rgba(85, 199, 122, 0.14);
+    color: #257b42;
+}
+
+.status-failed,
+.amount-debit {
+    background: rgba(182, 97, 97, 0.14);
+    color: #963d3d;
+}
+
+.status-running {
+    background: rgba(123, 97, 255, 0.12);
+    color: #5b43c7;
+}
+
+.work-row {
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+}
+
+.work-thumb {
+    width: 68px;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    background: #e8edf5 center/cover;
+}
+
+.work-meta {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.work-meta p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.work-side {
+    min-width: 0;
+    display: grid;
+    justify-items: end;
+    gap: 10px;
+}
+
+.work-status {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+}
+
+.work-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.work-actions .btn {
+    min-height: 34px;
+    padding-inline: 12px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.work-actions .btn[disabled] {
+    opacity: 0.5;
+}
+
+.account-inline-note {
+    justify-content: flex-end;
+}
+
+.custom-template-editor-panel {
+    margin-bottom: 16px;
+}
+
+.custom-template-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.custom-template-prompt-field {
+    display: grid;
+    gap: 8px;
+}
+
+.custom-template-prompt-field textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+}
+
+.account-payment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.payment-guide-card h3 {
+    margin: 4px 0 8px;
+    font-size: 15px;
+    line-height: 1.32;
+    letter-spacing: -0.01em;
+}
+
+.payment-guide-card p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.68;
+}
+
+.account-payment-media {
+    display: grid;
+    place-items: center;
+    padding: 6px;
+    margin-top: 8px;
+    border-radius: 12px;
+    background: var(--bg-warm);
+}
+
+.account-payment-media img {
+    display: block;
+    width: min(100%, 118px);
+    height: auto;
+    border-radius: 10px;
+    box-shadow: var(--shadow-soft);
+}
+
+.ledger-row strong,
+.order-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.invite-card {
+    padding: 28px;
+    background:
+        linear-gradient(145deg, #101522, #272e3f),
+        var(--black);
+    color: #fff;
+}
+
+.invite-card span,
+.invite-card p {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.invite-card strong {
+    display: block;
+    margin: 14px 0 10px;
+    font-size: clamp(28px, 3.8vw, 42px);
+    line-height: 1.02;
+    letter-spacing: 0.06em;
+    font-weight: 780;
+}
+
+.invite-card p {
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.invite-card .btn {
+    margin-top: 18px;
+    background: #fff;
+    color: var(--ink);
+}
+
+.security-list {
+    display: grid;
+    gap: 10px;
+}
+
+.security-list div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+}
+
+.security-list strong {
+    font-size: 14px;
+    font-weight: 720;
+}
+
+.security-list div:last-child {
+    border-bottom: 0;
+}
+
+.password-form {
+    display: grid;
+    gap: 14px;
+}
+
+.password-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.form-hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.security-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.empty-state {
+    padding: 22px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 16px;
+    background: var(--bg-warm);
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+@media (max-width: 1100px) {
+    .account-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .account-sidebar {
+        position: static;
+    }
+
+    .account-menu {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .account-topbar,
+    .account-hero,
+    .panel-heading,
+    .panel-heading.standalone {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .account-topbar {
+        height: auto;
+        padding: 14px 20px;
+    }
+
+    .account-shell {
+        width: min(100% - 28px, 1420px);
+        margin-top: 16px;
+    }
+
+    .account-menu,
+    .metric-grid,
+    .overview-grid,
+    .invite-layout,
+    .settings-grid,
+    .account-payment-grid,
+    .work-row,
+    .list-row-top,
+    .ledger-row,
+    .order-row {
+        grid-template-columns: 1fr;
+    }
+
+    .account-hero {
+        padding: 24px;
+    }
+
+    .account-hero-actions,
+    .account-nav-actions {
+        flex-wrap: wrap;
+    }
+
+    .work-side,
+    .work-status,
+    .work-actions {
+        justify-items: stretch;
+        justify-content: flex-start;
+    }
+
+    .password-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .custom-template-form-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,49 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __SERVER_NAME__;
+
+    # Production should terminate TLS on 443 and redirect HTTP to HTTPS.
+    # Keep this HTTP server only for health checks or certificate bootstrap.
+    client_max_body_size 20m;
+
+    # Keep Nginx aligned with backend static-file deny rules. Do not expose
+    # source trees, scripts, lock files, databases, archives, or payment SDKs
+    # that may live under webapp/assets.
+    location ~* ^/(?:assets/)?(?:awesome-gpt-image-2/.*/)?(?:\.git|\.github|backend|tools|mpay_v2_webman-master|vendor|node_modules|__pycache__)(?:/|$) {
+        return 404;
+    }
+
+    location ~* ^/assets/.*\.(?:php|py|rb|pl|sh|bash|zsh|fish|ps1|bat|cmd|exe|dll|so|dylib|jar|war|class|c|cc|cpp|h|hpp|go|rs|java|kt|swift|sql|sqlite|sqlite3|db|db-wal|db-shm|env|ini|cnf|conf|config|pem|key|crt|csr|p12|pfx|lock|log|bak|backup|old|orig|tmp|map|zip|tar|tgz|gz|bz2|xz|7z|rar)$ {
+        return 404;
+    }
+
+    location ~* ^/assets/.*(?:composer\.(?:json|lock)|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|Gemfile(?:\.lock)?|requirements\.txt|Pipfile(?:\.lock)?|Cargo\.lock|go\.(?:mod|sum)|Makefile|Dockerfile|docker-compose\.ya?ml|\.env(?:\..*)?|\.htaccess)$ {
+        return 404;
+    }
+
+    location ~* ^/assets/.*\.(?:avif|bmp|gif|ico|jpe?g|png|svg|webp|mp4|webm|mov|m4v|mp3|wav|ogg)$ {
+        root __ROOT_DIR__/webapp;
+        try_files $uri =404;
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
+    location /assets/ {
+        return 404;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:4178;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}

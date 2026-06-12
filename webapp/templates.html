@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案例模板库 - YCImage</title>
+    <meta name="description" content="浏览全部 GPT-Image2 本地案例模板，按分类搜索并进入模板生成页。">
+    <link rel="icon" href="assets/ycimage-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html#home" aria-label="YCImage 首页">
+                <span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span>
+                <span>YCImage</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html#home">首页</a></li>
+                <li><a href="index.html#templates">模板广场</a></li>
+                <li><a href="templates.html" class="active">案例模板</a></li>
+                <li><a href="index.html#template-editor">模板生成</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="index.html#template-editor" class="btn btn-primary">开始创作</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="template-library-page section-soft">
+            <div class="container">
+                <div class="library-header">
+                    <div>
+                        <p class="eyebrow">案例模板库</p>
+                        <h1>全部 GPT-Image2 案例模板</h1>
+                        <p>首页只放精选案例，这里分页浏览完整模板库。选择模板后会回到模板生成页。</p>
+                    </div>
+                    <a class="btn btn-secondary" href="index.html#awesome-templates">返回首页精选</a>
+                </div>
+
+                <div class="library-controls">
+                    <label>搜索
+                        <input id="librarySearch" type="search" placeholder="搜索标题、分类、风格">
+                    </label>
+                    <label>分类
+                        <select id="libraryCategory">
+                            <option value="all">全部分类</option>
+                        </select>
+                    </label>
+                    <label>每页数量
+                        <select id="libraryPageSize">
+                            <option value="12">12</option>
+                            <option value="24">24</option>
+                            <option value="48">48</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="library-status">
+                    <span id="libraryCount">0 个模板</span>
+                    <span id="libraryPageInfo">第 1 页</span>
+                </div>
+
+                <div class="awesome-template-grid library-grid" id="libraryGrid"></div>
+
+                <div class="library-pagination">
+                    <button class="btn btn-secondary" type="button" id="libraryPrev">上一页</button>
+                    <span class="library-page-indicator" id="libraryBottomPageInfo">第 1 / 1 页</span>
+                    <button class="btn btn-secondary" type="button" id="libraryNext">下一页</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <a class="logo" href="index.html#home" aria-label="YCImage 首页"><span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span><span>YCImage</span></a>
+                <p>上传图片、选择模板、生成内容前，请先阅读平台的隐私、支付和内容规则。</p>
+            </div>
+            <div class="footer-links">
+                <a href="legal.html">合规中心</a>
+                <a href="terms.html">用户协议</a>
+                <a href="privacy.html">隐私政策</a>
+                <a href="refund.html">退款政策</a>
+                <a href="content-policy.html">内容规则</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="templates.js"></script>
+</body>
+</html>

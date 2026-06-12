@@ -1,0 +1,17 @@
+[Unit]
+Description=YCImage Python App
+After=network.target
+
+[Service]
+Type=simple
+User=__RUN_USER__
+Group=__RUN_GROUP__
+WorkingDirectory=__ROOT_DIR__
+Environment=YCIMAGE_ENV_FILE=/etc/ycimage/ycimage.env
+ExecStart=__ROOT_DIR__/tools/linux/run_ycimage_linux.sh
+Restart=always
+RestartSec=3
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

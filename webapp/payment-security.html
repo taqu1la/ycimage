@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付与信息安全说明 - YCImage</title>
+    <meta name="description" content="YCImage 支付与信息安全说明，介绍 MPAY 扫码支付、客服开通、到账校验和风控日志处理方式。">
+    <link rel="icon" href="assets/ycimage-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="legal.css">
+</head>
+<body class="legal-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html#home" aria-label="返回 YCImage 首页">
+                <span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span>
+                <span>YCImage</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html#home">首页</a></li>
+                <li><a href="legal.html">合规中心</a></li>
+                <li><a href="payment-security.html" class="active">支付安全</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="index.html#pricing" class="btn btn-primary">购买积分</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="legal-shell">
+        <div class="container legal-layout">
+            <aside class="legal-sidebar">
+                <div>
+                    <span>Payment Security</span>
+                    <strong>支付与信息安全说明</strong>
+                    <p>本说明用于帮助用户理解 MPAY 扫码支付、人工开通、支付结果同步和平台账本之间的关系。</p>
+                </div>
+                <nav>
+                    <a href="#checkout">扫码支付</a>
+                    <a href="#card">支付信息</a>
+                    <a href="#verification">到账校验</a>
+                    <a href="#ledger">积分账本</a>
+                    <a href="#logs">风控日志</a>
+                </nav>
+            </aside>
+
+            <section class="legal-main">
+                <article class="legal-panel legal-hero">
+                    <span>Security</span>
+                    <h1>支付与信息安全说明</h1>
+                    <p>YCImage 当前主线为 MPAY 微信/支付宝扫码支付，并保留客服人工开通通道。平台服务端会根据订单支付状态、积分账本和必要的客服核验记录更新积分、会员或订单权益。</p>
+                </article>
+
+                <article class="legal-panel legal-section" id="checkout">
+                    <span>1</span>
+                    <h2>如何完成支付或开通</h2>
+                    <p>购买积分包或会员时，平台会优先创建 MPAY 订单并展示微信或支付宝二维码。若自动到账暂不可用或订单需要人工确认，你可以把订单号和支付凭证发给客服，由客服核验后开通。</p>
+                </article>
+
+                <article class="legal-panel legal-section" id="card">
+                    <span>2</span>
+                    <h2>支付信息如何处理</h2>
+                    <ul>
+                        <li>当前页面不采集完整支付账号、验证码等敏感支付信息。</li>
+                        <li>微信、支付宝或 MPAY 侧产生的支付凭证由对应支付服务方处理，YCImage 仅保存必要的订单号、支付状态、金额和到账结果。</li>
+                        <li>如需人工开通，客服可能要求你提供订单号、支付截图或转账凭证，用于核验订单和处理售后。</li>
+                    </ul>
+                </article>
+
+                <article class="legal-panel legal-section" id="verification">
+                    <span>3</span>
+                    <h2>为什么不是只看“支付成功页”</h2>
+                    <p>前端展示的支付成功提示不能作为唯一凭证。平台会以服务端订单状态、支付渠道回传结果、积分账本和必要的客服核验记录为准，再决定是否加积分或开通会员。</p>
+                </article>
+
+                <article class="legal-panel legal-section" id="ledger">
+                    <span>4</span>
+                    <h2>平台如何处理订单与积分</h2>
+                    <ul>
+                        <li>平台会以订单记录、支付状态、客服核验记录和积分账本为准。</li>
+                        <li>为避免重复加积分，平台应记录订单是否已履约，并对重复通知或重复提交进行幂等处理。</li>
+                        <li>用户看到的积分余额、订单状态和到账结果，以服务端最终记录为准。</li>
+                    </ul>
+                </article>
+
+                <article class="legal-panel legal-section" id="logs">
+                    <span>5</span>
+                    <h2>为争议处理保留哪些日志</h2>
+                    <ul>
+                        <li>订单号、支付时间、金额、币种、支付状态、支付渠道标识。</li>
+                        <li>用户账号标识、IP、User-Agent、登录会话、积分变更流水。</li>
+                        <li>生成记录、下载记录、协议同意记录、客服沟通记录。</li>
+                    </ul>
+                </article>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

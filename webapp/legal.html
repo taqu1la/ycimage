@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合规与政策中心 - YCImage</title>
+    <meta name="description" content="YCImage 合规与政策中心，集中展示隐私政策、用户协议、退款政策、内容规则和支付安全说明。">
+    <link rel="icon" href="assets/ycimage-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="legal.css">
+</head>
+<body class="legal-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="index.html#home" aria-label="返回 YCImage 首页">
+                <span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span>
+                <span>YCImage</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html#home">首页</a></li>
+                <li><a href="templates.html">案例模板</a></li>
+                <li><a href="index.html#pricing">定价</a></li>
+                <li><a href="legal.html" class="active">合规中心</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="index.html#template-editor" class="btn btn-primary">开始创作</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="legal-shell">
+        <div class="container legal-layout">
+            <aside class="legal-sidebar" aria-label="合规导航">
+                <div>
+                    <span>Compliance Center</span>
+                    <strong>YCImage 合规与政策中心</strong>
+                    <p>本页集中说明隐私、支付、退款、内容审核、数据安全及用户权利，适用于当前站点的 Cloudflare + Stripe Checkout 部署方案。</p>
+                </div>
+                <nav>
+                    <a href="terms.html">用户协议</a>
+                    <a href="privacy.html">隐私政策</a>
+                    <a href="refund.html">退款政策</a>
+                    <a href="content-policy.html">内容规则</a>
+                </nav>
+            </aside>
+
+            <section class="legal-main">
+                <article class="legal-panel legal-hero">
+                    <span>Platform Statement</span>
+                    <h1>当前支付、数据与内容处理方式的基础合规说明</h1>
+                    <p>YCImage 是一个面向图片与视频模板生成的在线平台。当前方案中，前端与业务系统可部署在 Cloudflare，支付通过 Stripe Checkout 完成，支付结果通过 Stripe Webhook 通知平台，再由平台为用户发放积分、会员权益或订单状态更新。</p>
+                    <div class="legal-meta">
+                        <strong>支付页面由 Stripe 托管</strong>
+                        <strong>业务数据可托管于 Cloudflare D1 / R2</strong>
+                        <strong>积分与权益由平台后台账本控制</strong>
+                    </div>
+                </article>
+
+                <article class="legal-panel legal-brand-panel">
+                    <div class="legal-brand-copy">
+                        <span>Brand & Contact</span>
+                        <h2>YC AI LAB</h2>
+                        <p>如果你需要咨询支付开通、售后处理、隐私请求、侵权投诉或合作对接，可以优先通过下方品牌联系卡找到我们。这个位置比把二维码硬塞到首页更自然，也更方便用户在需要时再联系。</p>
+                        <div class="legal-inline-links">
+                            <a href="privacy.html">隐私请求入口</a>
+                            <a href="refund.html">退款与售后说明</a>
+                            <a href="content-policy.html">侵权与内容规则</a>
+                        </div>
+                    </div>
+                    <div class="legal-brand-visual">
+                        <img src="assets/yc-ai-lab-contact-card.png" alt="YC AI LAB 联系方式二维码">
+                    </div>
+                </article>
+
+                <div class="legal-grid">
+                    <article class="legal-card">
+                        <span>Payment</span>
+                        <h3>银行卡与支付安全</h3>
+                        <p>当你使用 Stripe Checkout 付款时，银行卡号、有效期、CVC 等敏感支付信息在 Stripe 托管的支付页面录入和处理。YCImage 不应直接存储完整银行卡信息，也不应在自己的前端或数据库中保存完整卡号。</p>
+                    </article>
+                    <article class="legal-card">
+                        <span>Storage</span>
+                        <h3>图片、视频与账号数据</h3>
+                        <p>用户账号、积分、订单、任务记录可存放在数据库服务中；用户上传图片、生成结果和视频文件可存放于对象存储。你上传的内容将用于完成生成、下载、售后、风控和争议处理。</p>
+                    </article>
+                    <article class="legal-card">
+                        <span>Risk Control</span>
+                        <h3>争议、拒付与审计</h3>
+                        <p>为处理拒付、退款、账户滥用和违规内容，平台可能保留订单号、付款状态、IP、账号标识、积分流水、生成记录、下载记录及协议同意记录。</p>
+                    </article>
+                    <article class="legal-card">
+                        <span>Policies</span>
+                        <h3>上线前至少需要的政策页</h3>
+                        <p>建议在正式收款前公开展示用户协议、隐私政策、退款政策和内容规则，并在注册、下单、充值和上传入口可见位置提供访问链接。</p>
+                    </article>
+                </div>
+
+                <article class="legal-panel legal-section">
+                    <span>当前方案说明</span>
+                    <h2>你现在这套部署结构下，建议对外这样声明</h2>
+                    <table class="legal-table">
+                        <thead>
+                            <tr>
+                                <th>模块</th>
+                                <th>建议声明口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>网站与 API</td>
+                                <td>网站页面、业务接口、订单逻辑、积分账本、任务状态等由 YCImage 平台负责维护，可运行在 Cloudflare Pages、Workers 或其他云服务上。</td>
+                            </tr>
+                            <tr>
+                                <td>数据库与对象存储</td>
+                                <td>账号、积分、订单、任务记录可存放在数据库中；上传图片、生成图片、视频文件和静态资源可存放在对象存储中，用于生成、下载、售后与风控。</td>
+                            </tr>
+                            <tr>
+                                <td>支付处理</td>
+                                <td>支付通过 Stripe Checkout 等第三方支付服务完成。用户支付时会跳转到 Stripe 托管的结账页面，支付机构会处理银行卡及其他支付方式信息。</td>
+                            </tr>
+                            <tr>
+                                <td>支付回调</td>
+                                <td>支付成功后，Stripe 会通过 Webhook 通知平台。平台以服务端校验后的订单结果为准，为用户加积分、开通会员或更新订单状态。</td>
+                            </tr>
+                            <tr>
+                                <td>银行卡信息</td>
+                                <td>平台不主动收集、不展示、不保存完整银行卡号、CVC 或有效期。若未来引入卡片保存功能，也应仅使用支付服务商返回的 token、payment method ID 或掩码卡信息。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article class="legal-panel legal-section">
+                    <span>Important Reminder</span>
+                    <h2>正式上线前你还需要补全的关键信息</h2>
+                    <ul>
+                        <li>运营主体名称：个人、个体户或公司名称，建议写入所有政策页页脚。</li>
+                        <li>有效联系方式：客服邮箱、售后邮箱、法务或投诉邮箱，至少保留一个可访问邮箱。</li>
+                        <li>退款处理时限：例如“收到申请后 5-10 个工作日内处理”。</li>
+                        <li>数据保留周期：例如账号删除后保留订单和风控数据的最短必要期限。</li>
+                        <li>未成年人规则：是否允许未成年人使用，是否需要监护人同意。</li>
+                        <li>适用法域：你打算以哪个国家或地区主体运营、签约和收款。</li>
+                    </ul>
+                </article>
+
+                <article class="legal-note">
+                    <span>Not Legal Advice</span>
+                    <p>本页面内容用于网站基础合规展示和产品文案落地，不构成律师法律意见。涉及跨境收款、税务、隐私法、消费者保护、未成年人保护或 AI 内容监管时，建议结合你的实际主体所在地与目标市场，再由专业律师复核。</p>
+                    <div class="legal-inline-links">
+                        <a href="terms.html">查看用户协议</a>
+                        <a href="privacy.html">查看隐私政策</a>
+                        <a href="refund.html">查看退款政策</a>
+                        <a href="content-policy.html">查看内容规则</a>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

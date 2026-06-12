@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YCImage - AI 图片模板生成平台</title>
+    <meta name="description" content="选择模板、上传照片、填写信息，生成可直接发布的头像、宠物拍立得、产品图和短视频。">
+    <link rel="icon" href="assets/ycimage-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="logo" href="#home" aria-label="YCImage 首页">
+                <span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span>
+                <span>YCImage</span>
+            </a>
+            <button class="mobile-menu" id="mobileMenu" aria-label="打开导航" aria-controls="navLinks" aria-expanded="false">
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="active">首页</a></li>
+                <li><a href="#templates">模板广场</a></li>
+                <li><a href="#awesome-templates">案例模板</a></li>
+                <li><a href="#template-editor">模板生成</a></li>
+                <li><a href="#image-workbench">图片生成</a></li>
+                <li><a href="#video-workbench">视频生成</a></li>
+                <li><a href="#pricing">定价</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" data-open-account>登录/注册</button>
+                <button class="btn btn-secondary nav-register-btn" data-open-register>注册送 100 积分</button>
+                <a href="#template-editor" class="btn btn-primary">开始创作</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero section-soft">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <p class="eyebrow">给小红书、朋友圈、电商和宠物店的 AI 模板创作平台</p>
+                    <h1>选一个模板，上传一张图，生成能直接发布的 AI 作品</h1>
+                    <p class="hero-subtitle">宠物拍立得、萌娃插画、头像写真、产品图和短视频封面，一套流程帮你把照片变成可用内容。</p>
+                    <div class="hero-actions">
+                        <a href="#template-editor" class="btn btn-primary btn-large">开始生成</a>
+                        <a href="#templates" class="btn btn-secondary btn-large">看看模板库</a>
+                    </div>
+                    <div class="trust-row" aria-label="平台信任信息">
+                        <span>今日已生成 <strong>12,486</strong> 张</span>
+                        <span id="paymentTrustPill">扫码支付</span>
+                        <span>高清下载</span>
+                    </div>
+                </div>
+                <div class="hero-showcase hero-loading" aria-label="作品样张展示">
+                    <article class="showcase-card polaroid-card main-sample portrait-card" id="heroCardPrimary">
+                        <div class="sample-image sample-pet" id="heroImagePrimary"></div>
+                        <div class="polaroid-caption">
+                            <span id="heroTitlePrimary">毛孩子拍立得</span>
+                            <small id="heroMetaPrimary">5 积分 / 张</small>
+                        </div>
+                    </article>
+                    <article class="floating-card sample-card child-card portrait-card" id="heroCardSecondary">
+                        <div class="sample-image sample-child" id="heroImageSecondary"></div>
+                        <span id="heroTitleSecondary">萌娃插画</span>
+                    </article>
+                    <article class="floating-card sample-card product-card portrait-card" id="heroCardTertiary">
+                        <div class="sample-image sample-product" id="heroImageTertiary"></div>
+                        <span id="heroTitleTertiary">产品广告图</span>
+                    </article>
+                    <div class="preview-widget">
+                        <span class="status-dot"></span>
+                        模板已拆好字段，不用写提示词
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="templates" class="templates section">
+            <div class="container">
+                <div class="section-heading split-heading">
+                    <div>
+                        <p class="eyebrow">模板广场</p>
+                        <h2>不用写提示词，选一个喜欢的效果直接生成</h2>
+                    </div>
+                    <a class="text-link" href="#awesome-templates">查看热门模板</a>
+                </div>
+                <div class="category-row" id="homeCategoryRow" aria-label="模板分类">
+                    <button class="chip active" data-filter="all">全部</button>
+                </div>
+                <div class="template-grid" id="homeTemplateGrid">
+                    <article class="template-card" data-category="pet">
+                        <div class="template-cover sample-pet"></div>
+                        <div class="template-body">
+                            <span class="tag">需上传照片</span>
+                            <h3>毛孩子拍立得</h3>
+                            <p>上传宠物照片，生成水彩手绘拍立得收藏卡。</p>
+                            <div class="card-meta">
+                                <span>42,109 人用过</span>
+                                <strong>5 积分/张</strong>
+                            </div>
+                            <a href="#template-editor" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                    <article class="template-card" data-category="kid">
+                        <div class="template-cover sample-child"></div>
+                        <div class="template-body">
+                            <span class="tag sage">支持中文名字</span>
+                            <h3>萌娃拍立得</h3>
+                            <p>把生活照变成温柔插画风纪念卡。</p>
+                            <div class="card-meta">
+                                <span>18,732 人用过</span>
+                                <strong>6 积分/张</strong>
+                            </div>
+                            <a href="#template-editor" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                    <article class="template-card" data-category="product">
+                        <div class="template-cover sample-product"></div>
+                        <div class="template-body">
+                            <span class="tag brown">电商适用</span>
+                            <h3>产品广告图</h3>
+                            <p>为护肤、香氛、食品生成可投放的主图。</p>
+                            <div class="card-meta">
+                                <span>9,842 人用过</span>
+                                <strong>8 积分/张</strong>
+                            </div>
+                            <a href="#template-editor" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                    <article class="template-card" data-category="avatar">
+                        <div class="template-cover sample-avatar"></div>
+                        <div class="template-body">
+                            <span class="tag">4:5 输出</span>
+                            <h3>头像写真</h3>
+                            <p>生成干净、有生活感的头像和人物写真。</p>
+                            <div class="card-meta">
+                                <span>31,564 人用过</span>
+                                <strong>7 积分/张</strong>
+                            </div>
+                            <a href="#template-editor" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                    <article class="template-card" data-category="poster">
+                        <div class="template-cover sample-poster"></div>
+                        <div class="template-body">
+                            <span class="tag sage">封面模板</span>
+                            <h3>小红书封面</h3>
+                            <p>为种草笔记、活动海报生成封面底图。</p>
+                            <div class="card-meta">
+                                <span>26,011 人用过</span>
+                                <strong>4 积分/张</strong>
+                            </div>
+                            <a href="#template-editor" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                    <article class="template-card" data-category="video">
+                        <div class="template-cover sample-video"></div>
+                        <div class="template-body">
+                            <span class="tag brown">图生视频</span>
+                            <h3>照片动起来</h3>
+                            <p>上传一张作品图，生成适合短视频平台的轻运镜。</p>
+                            <div class="card-meta">
+                                <span>7,920 人用过</span>
+                                <strong>20 积分/条</strong>
+                            </div>
+                            <a href="#video-workbench" class="card-action">使用模板</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="awesome-templates" class="awesome-templates section section-paper">
+            <div class="container">
+                <div class="section-heading split-heading">
+                    <div>
+                        <p class="eyebrow">GPT-Image2 案例模板库</p>
+                        <h2>已收录 473 个可直接生成的案例模板</h2>
+                        <p>热门案例先展示在首页，完整模板库按分类、搜索和分页浏览，点击任意模板即可进入对应生成页面。</p>
+                    </div>
+                    <div class="awesome-actions">
+                        <a class="btn btn-secondary" href="#template-editor">进入生成器</a>
+                        <a class="btn btn-primary" href="templates.html">查看更多模板</a>
+                    </div>
+                </div>
+                <div class="awesome-stats" aria-label="数据库模板库状态">
+                    <span><strong id="awesomeTemplateCount">473</strong> 个案例模板</span>
+                    <span><strong id="awesomeImageCount">479</strong> 个入库图片</span>
+                    <span><strong id="awesomeStyleCount">22</strong> 套风格模板</span>
+                    <span>MIT License</span>
+                </div>
+                <div class="awesome-template-grid" id="awesomeTemplateGrid">
+                    <article class="awesome-template-card loading-card">
+                        <div class="awesome-template-cover"></div>
+                        <div>
+                            <span>Loading</span>
+                            <h3>正在读取数据库模板库</h3>
+                            <p>模板、参数和图片都从后端 SQLite API 读取。</p>
+                            <small>/api/templates</small>
+                        </div>
+                    </article>
+                </div>
+                <div class="awesome-more-row">
+                    <span id="awesomeVisibleInfo">先展示热门案例</span>
+                    <a class="btn btn-secondary" href="templates.html">查看更多案例</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="template-editor" class="template-editor section">
+            <div class="container">
+                <div class="section-heading split-heading">
+                    <div>
+                        <p class="eyebrow">模板生成页</p>
+                        <h2 id="editorTemplateTitle">从案例模板进入生成器</h2>
+                        <p id="editorTemplateDescription">点击上方任意案例模板后，这里会加载对应的真实提示词、可调整参数和最终 Prompt 编辑区。</p>
+                    </div>
+                    <div class="editor-toolbar">
+                        <a class="btn btn-secondary" href="#awesome-templates">返回模板库</a>
+                        <button class="btn btn-primary" type="button" id="generateFromTemplate">生成</button>
+                    </div>
+                </div>
+
+                <div class="template-editor-grid">
+                    <div class="template-editor-main">
+                        <div class="prompt-panel template-showcase-panel">
+                            <div class="prompt-panel-header">
+                                <div>
+                                    <span>模板示例图</span>
+                                    <strong id="promptStats">0 字符</strong>
+                                </div>
+                                <div class="prompt-actions">
+                                    <button class="btn btn-secondary" type="button" id="resetTemplateParams">重置参数</button>
+                                    <button class="btn btn-primary" type="button" id="copyTemplatePrompt">复制最终 Prompt</button>
+                                </div>
+                            </div>
+                            <div class="prompt-compose-grid">
+                                <div class="prompt-template-preview prompt-template-preview-large">
+                                    <div class="prompt-template-image" id="promptTemplateImage">
+                                        <span>模板图</span>
+                                    </div>
+                                    <div>
+                                        <strong id="promptTemplateName">先选择模板</strong>
+                                        <small id="promptTemplateMeta">模板图会显示在这里</small>
+                                    </div>
+                                </div>
+                                <div class="prompt-guide-stack">
+                                    <div class="prompt-user-guide" id="templatePromptGuide">
+                                        <span>中文创作说明</span>
+                                        <strong>先选择模板</strong>
+                                        <p>这里会用中文解释模板效果，并提示用户优先修改哪些地方。</p>
+                                    </div>
+                                    <label class="prompt-user-edit-field">
+                                        <span>自定义修改要求</span>
+                                        <textarea id="templateUserPromptEdit" rows="8" placeholder="用中文写你想改哪里。例如：把场景改成上海迪士尼，人物换成妈妈和两个孩子，整体更像小红书旅行手账。"></textarea>
+                                        <small id="templateUserPromptHint">这里写中文即可，会和模板底稿一起提交生成；不需要懂英文 Prompt。</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <details class="prompt-raw-details">
+                                <summary>高级：查看/编辑原始英文 Prompt</summary>
+                                <label class="prompt-editor-field">
+                                    <span>英文模板底稿</span>
+                                    <textarea id="templatePromptEditor" spellcheck="false" placeholder="选择模板后会在这里生成可直接提交给模型的 Prompt，你也可以继续手动调整。"></textarea>
+                                </label>
+                            </details>
+                        </div>
+
+                        <form class="generation-config" id="templateGenerationConfig">
+                            <div class="param-header">
+                                <span>生成设置</span>
+                                <strong>先配置模型与输出</strong>
+                            </div>
+                            <div class="config-grid">
+                                <label>调用模型
+                                    <select id="templateModel">
+                                        <option value="gpt-image-2">GPT-Image-2</option>
+                                        <option value="seedream-5.0">Seedream 5.0</option>
+                                        <option value="flux-kontext">Flux Kontext</option>
+                                        <option value="midjourney">Midjourney</option>
+                                    </select>
+                                </label>
+                                <label>图片质量
+                                    <select id="templateQuality">
+                                        <option value="auto">Auto 自动</option>
+                                        <option value="high">High 高质量</option>
+                                        <option value="medium">Medium 标准</option>
+                                        <option value="low">Low 快速</option>
+                                    </select>
+                                </label>
+                                <label>输出比例
+                                    <select id="templateAspectRatio">
+                                        <option value="auto">Auto 自动</option>
+                                        <option value="1:1">1:1 方图</option>
+                                        <option value="3:4">3:4 竖图</option>
+                                        <option value="4:3">4:3 横图</option>
+                                        <option value="4:5">4:5 小红书</option>
+                                        <option value="5:4">5:4 横图</option>
+                                        <option value="2:3">2:3 竖图</option>
+                                        <option value="3:2">3:2 横图</option>
+                                        <option value="9:16">9:16 竖屏</option>
+                                        <option value="16:9">16:9 横图</option>
+                                        <option value="2:1">2:1 宽屏</option>
+                                        <option value="1:2">1:2 长图</option>
+                                        <option value="21:9">21:9 超宽</option>
+                                        <option value="9:21">9:21 超长</option>
+                                    </select>
+                                </label>
+                                <label>图片尺寸
+                                    <select id="templateImageSize">
+                                        <option value="auto">Auto</option>
+                                        <option value="1:1">1:1</option>
+                                        <option value="3:4">3:4</option>
+                                        <option value="4:3">4:3</option>
+                                        <option value="4:5">4:5</option>
+                                        <option value="5:4">5:4</option>
+                                        <option value="2:3">2:3</option>
+                                        <option value="3:2">3:2</option>
+                                        <option value="16:9">16:9</option>
+                                        <option value="9:16">9:16</option>
+                                        <option value="2:1">2:1</option>
+                                        <option value="1:2">1:2</option>
+                                        <option value="21:9">21:9</option>
+                                        <option value="9:21">9:21</option>
+                                    </select>
+                                </label>
+                                <label>生成数量
+                                    <select id="templateOutputCount">
+                                        <option value="1">1 张</option>
+                                        <option value="2">2 张</option>
+                                        <option value="4">4 张</option>
+                                    </select>
+                                </label>
+                                <label>输出格式
+                                    <select id="templateOutputFormat">
+                                        <option value="png">PNG</option>
+                                        <option value="jpeg">JPEG</option>
+                                        <option value="webp">WEBP</option>
+                                    </select>
+                                </label>
+                                <label>背景模式
+                                    <select id="templateBackground">
+                                        <option value="auto">自动背景</option>
+                                        <option value="opaque">不透明背景</option>
+                                        <option value="transparent">透明背景</option>
+                                    </select>
+                                </label>
+                                <label>审核强度
+                                    <select id="templateModeration">
+                                        <option value="auto">Auto 自动</option>
+                                        <option value="low">Low 低审查</option>
+                                    </select>
+                                </label>
+                                <label>压缩强度
+                                    <input id="templateOutputCompression" type="number" min="0" max="100" step="1" placeholder="留空使用默认">
+                                </label>
+                                <label>参考图策略
+                                    <select id="templateReferenceMode">
+                                        <option value="optional">可选上传参考图</option>
+                                        <option value="required">必须上传参考图</option>
+                                        <option value="text-only">仅文本生成</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <p class="config-tip" id="templateOfficialOptionHint">APIMART `gpt-image-2-official` 额外支持输出格式、背景、审核强度等参数；透明背景与 JPEG 不能同时使用，且 official 路由不支持透明背景。</p>
+                            <div class="template-reference-uploader">
+                                <div class="template-reference-drop" id="templateReferenceDrop" role="button" tabindex="0" aria-label="上传参考图">
+                                    <div class="template-reference-drop-main">
+                                        <div>
+                                            <span>参考图</span>
+                                            <strong id="templateReferenceCount">0 / 10</strong>
+                                        </div>
+                                        <em>上传图片</em>
+                                    </div>
+                                    <div class="template-reference-preview" id="templateReferencePreview" aria-live="polite"></div>
+                                </div>
+                                <input id="templateReferenceInput" type="file" accept="image/*" multiple hidden>
+                            </div>
+                            <div class="credit-estimate" aria-live="polite">
+                                <div>
+                                    <span>本次预计消耗</span>
+                                    <strong id="templateCreditEstimate">-- 积分</strong>
+                                </div>
+                                <p id="templateCreditBreakdown">模型基础积分会叠加图片质量、尺寸和生成数量。</p>
+                            </div>
+                        </form>
+
+                        <form class="param-panel" id="templateParamForm">
+                            <div class="param-empty">
+                                <strong>先选择一个案例模板</strong>
+                                <p>选择后会自动识别 Prompt 里的参数位，例如 【品牌名】、[CITY/COUNTRY] 或 {argument ...}。</p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="template-result-panel">
+                        <div class="template-result-image is-empty" id="editorResultImage">
+                            <span id="editorResultPlaceholder">等待生成结果</span>
+                        </div>
+                        <div class="template-result-body">
+                            <span>生成结果</span>
+                            <h3 id="editorResultTitle">等待模板输入</h3>
+                            <p id="editorResultSummary">左侧调整参数、上传参考图后，点击生成即可进入队列。</p>
+                            <div class="template-result-actions">
+                                <button class="btn btn-primary" type="button" id="downloadTemplateResult" disabled>下载结果</button>
+                            </div>
+                            <small id="editorResultMeta">生成完成后可下载高清图。</small>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section class="steps section section-paper">
+            <div class="container">
+                <div class="section-heading centered">
+                    <p class="eyebrow">三步生成</p>
+                    <h2>普通用户也能稳定出成品</h2>
+                    <p>把复杂提示词拆成可填写字段，让每次生成都更可控。</p>
+                </div>
+                <div class="steps-grid">
+                    <article>
+                        <span class="step-index">01</span>
+                        <h3>选模板</h3>
+                        <p>从宠物、萌娃、产品图、头像和短视频模板里选择效果。</p>
+                    </article>
+                    <article>
+                        <span class="step-index">02</span>
+                        <h3>上传图片 / 填写信息</h3>
+                        <p>上传清晰照片，填写名字、风格、装饰、输出比例。</p>
+                    </article>
+                    <article>
+                        <span class="step-index">03</span>
+                        <h3>生成并下载</h3>
+                        <p>生成多张结果，收藏、下载、复制参数或继续转成短视频。</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="template-detail" class="template-detail section" hidden>
+            <div class="container detail-grid">
+                <div class="detail-form">
+                    <p class="eyebrow">热门模板</p>
+                    <h2>毛孩子拍立得生成器</h2>
+                    <p class="detail-intro">上传一张清晰宠物照，填写名字和风格，生成一张带自然出框效果的水彩拍立得。</p>
+                    <div class="template-stats">
+                        <span>5 积分 / 张</span>
+                        <span>预计 90 秒</span>
+                        <span>支持猫 / 狗 / 兔子 / 仓鼠</span>
+                    </div>
+
+                    <form class="creation-form" id="templateForm">
+                        <fieldset>
+                            <legend>上传宠物照片</legend>
+                            <div class="upload-area" id="image-upload">
+                                <div class="upload-placeholder">
+                                    <span class="icon-upload" aria-hidden="true"></span>
+                                    <strong>拖拽或点击上传</strong>
+                                    <p>建议上传正脸或半身清晰照片，避免多只宠物同框。</p>
+                                </div>
+                            </div>
+                            <input type="file" id="image-input" accept="image/*" hidden>
+                            <div class="quality-check">
+                                <span>清晰度：待检测</span>
+                                <span>主体：待检测</span>
+                                <span>遮挡：待检测</span>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>宠物信息</legend>
+                            <div class="form-row">
+                                <label>宠物名字
+                                    <input id="petName" type="text" placeholder="例如：糯米">
+                                </label>
+                                <label>宠物类型
+                                    <select id="petType">
+                                        <option>猫</option>
+                                        <option>狗</option>
+                                        <option>兔子</option>
+                                        <option>仓鼠</option>
+                                        <option>其他</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <label>性格表情
+                                <select id="petMood">
+                                    <option>乖巧</option>
+                                    <option>调皮</option>
+                                    <option>高冷</option>
+                                    <option>温柔</option>
+                                    <option>好奇</option>
+                                    <option>开心</option>
+                                </select>
+                            </label>
+                            <label>外貌特征
+                                <textarea id="appearance" placeholder="例：奶油色长毛，圆眼睛，粉色鼻子，耳朵小，戴蓝色围巾。"></textarea>
+                            </label>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>拍立得风格</legend>
+                            <div class="swatch-row" id="colorSwatches">
+                                <button type="button" class="swatch active" data-color="奶油黄" style="--swatch:#F0DCA8">奶油黄</button>
+                                <button type="button" class="swatch" data-color="复古绿" style="--swatch:#B8C5A4">复古绿</button>
+                                <button type="button" class="swatch" data-color="樱桃粉" style="--swatch:#EAC0BD">樱桃粉</button>
+                                <button type="button" class="swatch" data-color="灰蓝" style="--swatch:#AAB8C9">灰蓝</button>
+                            </div>
+                            <div class="form-row">
+                                <label>背景浓度
+                                    <select id="bgDensity">
+                                        <option>淡彩</option>
+                                        <option>中等</option>
+                                        <option>饱和</option>
+                                        <option>复古低饱和</option>
+                                    </select>
+                                </label>
+                                <label>画风强度
+                                    <select id="styleStrength">
+                                        <option>彩绘与真实之间</option>
+                                        <option>偏真实</option>
+                                        <option>更水彩</option>
+                                        <option>更插画</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>出框与装饰</legend>
+                            <div class="form-row">
+                                <label>出框部位
+                                    <select id="popPart">
+                                        <option>前爪</option>
+                                        <option>耳朵</option>
+                                        <option>毛发</option>
+                                        <option>尾巴</option>
+                                        <option>头顶</option>
+                                    </select>
+                                </label>
+                                <label>出框方式
+                                    <select id="popStyle">
+                                        <option>前爪搭在底部白边</option>
+                                        <option>轻轻越过内框</option>
+                                        <option>毛发自然溢出</option>
+                                        <option>尾巴从侧边探出</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <label>名字位置
+                                    <select id="namePosition">
+                                        <option>底部右下</option>
+                                        <option>底部居中偏右</option>
+                                        <option>左下角</option>
+                                        <option>不显示</option>
+                                    </select>
+                                </label>
+                                <label>名字风格
+                                    <select id="nameStyle">
+                                        <option>手写签名</option>
+                                        <option>彩色蜡笔</option>
+                                        <option>细线笔记</option>
+                                        <option>复古字迹</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <label>装饰元素
+                                <input id="decorations" type="text" placeholder="小星星、小花、小爪印，局部点缀即可">
+                            </label>
+                            <div class="quantity-row">
+                                <span>生成数量</span>
+                                <button type="button" class="quantity active" data-count="1">1 张</button>
+                                <button type="button" class="quantity" data-count="4">4 张</button>
+                            </div>
+                        </fieldset>
+
+                        <button type="button" class="btn btn-primary btn-full" id="generateBtn">立即生成</button>
+                    </form>
+                </div>
+                <aside class="detail-preview">
+                    <div class="sticky-preview">
+                        <div class="preview-header">
+                            <div>
+                                <span class="tag brown">当前模板样张</span>
+                                <h3>你的预览</h3>
+                            </div>
+                            <button class="icon-btn" id="clearPreview" aria-label="清空预览"></button>
+                        </div>
+                        <div class="result-container" id="resultArea">
+                            <div class="preview-polaroid">
+                                <div class="sample-image sample-pet"></div>
+                                <p id="previewName">Nuo Mi</p>
+                            </div>
+                        </div>
+                        <div class="result-actions" id="resultActions">
+                            <button class="btn-action" id="downloadBtn">下载</button>
+                            <button class="btn-action" id="regenerateBtn">重新生成</button>
+                            <button class="btn-action">收藏</button>
+                            <button class="btn-action">转视频</button>
+                        </div>
+                        <div class="history-strip" aria-label="生成记录">
+                            <div class="history-item sample-pet active"></div>
+                            <div class="history-item sample-child"></div>
+                            <div class="history-item sample-product"></div>
+                            <div class="history-item sample-avatar"></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="image-workbench" class="workbench section section-paper">
+            <div class="container">
+                <div class="section-heading split-heading">
+                    <div>
+                        <p class="eyebrow">自定义图片生成</p>
+                        <h2>不选模板，也能直接生成成品图</h2>
+                    </div>
+                    <button class="btn btn-secondary" type="button" id="toggleAdvanced">展开高级参数</button>
+                </div>
+
+                <div class="custom-image-grid">
+                    <form class="custom-image-panel" id="customImageForm">
+                        <div class="custom-panel-header">
+                            <div>
+                                <span>Input</span>
+                                <strong>输入参数</strong>
+                            </div>
+                            <em id="customImageModelMeta">默认高清链路</em>
+                        </div>
+
+                        <label class="custom-prompt-field">提示词
+                            <textarea id="customImagePrompt" maxlength="4000" placeholder="例：一张电商详情页主图，白色背景，一只陶瓷咖啡杯，柔和棚拍光，保留真实材质，高清细节。"></textarea>
+                        </label>
+
+                        <div class="custom-form-grid">
+                            <label>模型
+                                <select id="customImageModel"></select>
+                            </label>
+                            <label>质量
+                                <select id="customImageQuality"></select>
+                            </label>
+                            <label>画幅 / 尺寸
+                                <select id="customImageSize"></select>
+                            </label>
+                            <label>生成数量
+                                <select id="customImageCount">
+                                    <option value="1">1 张</option>
+                                    <option value="2">2 张</option>
+                                    <option value="4">4 张</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="custom-reference-block">
+                            <div class="template-reference-drop custom-reference-drop" id="customImageReferenceDrop" role="button" tabindex="0" aria-label="上传参考图">
+                                <div class="template-reference-drop-main">
+                                    <div>
+                                        <span>参考图</span>
+                                        <strong id="customImageReferenceCount">0 / 10</strong>
+                                    </div>
+                                    <em>上传图片</em>
+                                </div>
+                                <div class="template-reference-preview" id="customImageReferencePreview" aria-live="polite"></div>
+                            </div>
+                            <input id="customImageReferenceInput" type="file" accept="image/*" multiple hidden>
+                        </div>
+
+                        <div class="advanced-panel custom-advanced-panel" id="customImageAdvancedPanel">
+                            <div class="custom-form-grid">
+                                <label>参考图策略
+                                    <select id="customImageReferenceMode">
+                                        <option value="optional">可选参考图</option>
+                                        <option value="required">必须参考图</option>
+                                        <option value="text-only">仅文本生成</option>
+                                    </select>
+                                </label>
+                                <label>输出格式
+                                    <select id="customImageOutputFormat">
+                                        <option value="png">PNG</option>
+                                        <option value="jpeg">JPEG</option>
+                                        <option value="webp">WEBP</option>
+                                    </select>
+                                </label>
+                                <label>背景模式
+                                    <select id="customImageBackground">
+                                        <option value="auto">自动背景</option>
+                                        <option value="opaque">不透明背景</option>
+                                        <option value="transparent">透明背景</option>
+                                    </select>
+                                </label>
+                                <label>审核强度
+                                    <select id="customImageModeration">
+                                        <option value="auto">Auto 自动</option>
+                                        <option value="low">Low 低审查</option>
+                                    </select>
+                                </label>
+                                <label>压缩强度
+                                    <input id="customImageOutputCompression" type="number" min="0" max="100" step="1" placeholder="留空使用默认">
+                                </label>
+                            </div>
+                            <p class="config-tip" id="customImageOfficialHint">默认使用高清链路；选择 GPT Image 2 Official 后，会启用输出格式、背景、审核和压缩参数。</p>
+                        </div>
+
+                        <div class="credit-estimate custom-credit-estimate" aria-live="polite">
+                            <div>
+                                <span>本次预计消耗</span>
+                                <strong id="customImageCreditEstimate">-- 积分</strong>
+                            </div>
+                            <p id="customImageCreditBreakdown">模型基础积分会叠加质量、尺寸和生成数量。</p>
+                        </div>
+
+                        <div class="custom-image-actions">
+                            <button class="btn btn-primary" type="submit" id="generateCustomImage">生成</button>
+                            <button class="btn btn-secondary" type="button" id="resetCustomImage">清空</button>
+                        </div>
+                    </form>
+
+                    <aside class="custom-output-panel">
+                        <div class="custom-panel-header">
+                            <div>
+                                <span>Output</span>
+                                <strong id="customImageResultTitle">输出结果</strong>
+                            </div>
+                            <em id="customImageResultMeta">等待生成</em>
+                        </div>
+                        <div class="custom-output-preview is-empty" id="customImageResultPreview">
+                            <span id="customImageResultPlaceholder">等待生成结果</span>
+                        </div>
+                        <div class="custom-result-gallery" id="customImageResultGallery" hidden></div>
+                        <div class="template-result-actions custom-result-actions">
+                            <button class="btn btn-primary" type="button" id="downloadCustomImageResult" disabled>下载结果</button>
+                            <button class="btn btn-secondary" type="button" id="openCustomImageResult" disabled>新窗口打开</button>
+                            <button class="btn btn-secondary" type="button" id="saveCustomImageTemplate">保存模板</button>
+                        </div>
+                        <p class="custom-result-summary" id="customImageResultSummary">左侧填写提示词后提交生成；觉得好用可以保存为自己的模板，基础用户最多保存 10 个。</p>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section id="video-workbench" class="video section">
+            <div class="container video-grid">
+                <div class="video-controls-panel">
+                    <p class="eyebrow">视频生成工作台</p>
+                    <h2>图片动起来，或从文案生成短视频</h2>
+                    <p class="detail-intro">上传商品图、人物图或海报图，也可以直接用文字生成短视频。</p>
+                    <div class="mode-tabs video-mode-tabs" id="videoModeTabs" role="tablist" aria-label="视频生成模式">
+                        <button class="mode-tab active" id="videoModeImageTab" type="button" role="tab" data-video-mode="image" aria-selected="true" aria-controls="videoModePanel">图生视频</button>
+                        <button class="mode-tab" id="videoModeTextTab" type="button" role="tab" data-video-mode="text" aria-selected="false" aria-controls="videoModePanel">文生视频</button>
+                    </div>
+                    <div class="video-options" id="videoModePanel" role="tabpanel" aria-labelledby="videoModeImageTab">
+                        <label>模型
+                            <select id="videoModel"></select>
+                        </label>
+                        <label>画质
+                            <select id="videoResolution">
+                                <option value="480p">480p</option>
+                                <option value="720p" selected>720p</option>
+                                <option value="1080p">1080p</option>
+                            </select>
+                        </label>
+                        <label>比例
+                            <select id="videoAspectRatio">
+                                <option value="16:9">16:9 横版</option>
+                                <option value="9:16">9:16 竖版</option>
+                                <option value="1:1">1:1 方图</option>
+                            </select>
+                        </label>
+                        <label>时长
+                            <select id="videoDuration">
+                                <option value="5">5 秒</option>
+                                <option value="8">8 秒</option>
+                                <option value="10">10 秒</option>
+                            </select>
+                        </label>
+                        <label>运镜
+                            <select id="videoMotion">
+                                <option value="dolly-in">轻推近</option>
+                                <option value="pan-left">左右平移</option>
+                                <option value="pull-back">慢慢拉远</option>
+                                <option value="orbit">轻微环绕</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="video-prompt-field">提示词
+                        <textarea id="videoPrompt" rows="5" placeholder="描述你要生成的视频内容、动作、镜头和风格"></textarea>
+                    </label>
+                    <div class="video-upload" id="videoReferenceDrop" role="button" tabindex="0">
+                        <input id="videoReferenceInput" type="file" accept="image/*" multiple hidden>
+                        <div>
+                            <span>参考图</span>
+                            <strong>上传图片</strong>
+                            <small id="videoReferenceCount">0 / 10</small>
+                        </div>
+                        <em>选择文件</em>
+                    </div>
+                    <div class="video-reference-preview" id="videoReferencePreview"></div>
+                    <div class="video-cost-row">
+                        <strong id="videoCreditEstimate">18 积分</strong>
+                        <span id="videoCreditBreakdown">选择模型后自动计算消耗</span>
+                    </div>
+                    <button class="btn btn-primary" id="generateVideo" type="button">生成</button>
+                    <div class="video-template-grid" id="videoTemplateGrid" aria-live="polite"></div>
+                    <a class="video-more-link" href="templates.html?type=video">查看更多视频模板</a>
+                </div>
+                <div class="video-result-panel">
+                    <div class="video-preview sample-video" id="videoPreview">
+                        <div class="play-button" aria-hidden="true"></div>
+                        <span id="videoPreviewLabel">等待生成结果</span>
+                    </div>
+                    <div class="video-result-meta">
+                        <strong id="videoResultTitle">视频结果</strong>
+                        <p id="videoResultSummary">生成完成后可以在线播放和下载。</p>
+                        <a class="btn btn-secondary disabled" id="downloadVideoResult" href="#" download>下载视频</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="why section">
+            <div class="container why-grid">
+                <div>
+                    <p class="eyebrow">为什么比直接问 AI 更稳</p>
+                    <h2>把提示词拆成字段，结果才可复用</h2>
+                </div>
+                <div class="why-list">
+                    <article>
+                        <h3>不用自己写复杂提示词</h3>
+                        <p>名字、风格、出框、背景、装饰都变成可控选项。</p>
+                    </article>
+                    <article>
+                        <h3>适合中文内容场景</h3>
+                        <p>支持中文名字、中文签名、朋友圈和小红书常用比例。</p>
+                    </article>
+                    <article>
+                        <h3>适合批量生成和复购</h3>
+                        <p>保存参数、重新生成、收藏模板、作品转视频，一条链路完成。</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing section section-paper">
+            <div class="container">
+                <div class="section-heading centered">
+                    <p class="eyebrow">定价 / 积分</p>
+                    <h2>会员订阅 + 一次性积分包</h2>
+                    <p>生成前显示所需积分，当前支持 MPAY 扫码支付；如自动到账暂不可用，可联系客服核验开通。</p>
+                </div>
+                <div class="pricing-toggle">
+                    <span>月付</span>
+                    <label class="switch">
+                        <input type="checkbox" id="billingCycle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>年付省 20%</span>
+                </div>
+                <div class="pricing-grid">
+                    <article class="pricing-card">
+                        <h3>免费体验</h3>
+                        <div class="price"><span class="amount">¥0</span></div>
+                        <p>适合先体验模板效果。</p>
+                        <ul>
+                <li>注册送 100 积分</li>
+                            <li>基础模板体验</li>
+                            <li>生成失败不消耗积分</li>
+                        </ul>
+                        <button class="btn-pricing" data-open-payment="free">开始体验</button>
+                    </article>
+                    <article class="pricing-card">
+                        <h3>月卡</h3>
+                        <div class="price"><span class="amount" data-monthly="29" data-yearly="23">¥29</span><span>/月</span></div>
+                        <p>适合偶尔玩图。</p>
+                        <ul>
+                            <li>300 积分 / 月</li>
+                            <li>高清下载</li>
+                            <li>基础模板</li>
+                        </ul>
+                        <button class="btn-pricing" data-open-payment="basic">立即开通</button>
+                    </article>
+                    <article class="pricing-card featured">
+                        <span class="featured-badge">推荐</span>
+                        <h3>创作者版</h3>
+                        <div class="price"><span class="amount" data-monthly="199" data-yearly="159">¥199</span><span>/月</span></div>
+                        <p>适合小红书、朋友圈和电商素材。</p>
+                        <ul>
+                            <li>1500 积分 / 月</li>
+                            <li>热门模板</li>
+                            <li>批量生成</li>
+                            <li>高清下载</li>
+                        </ul>
+                        <button class="btn-pricing" data-open-payment="pro">立即开通</button>
+                    </article>
+                    <article class="pricing-card">
+                        <h3>工作室版</h3>
+                        <div class="price"><span class="amount" data-monthly="499" data-yearly="399">¥499</span><span>/月</span></div>
+                        <p>适合广告设计、女装店和内容团队。</p>
+                        <ul>
+                            <li>6000 积分 / 月</li>
+                            <li>团队账号</li>
+                            <li>团队素材管理</li>
+                            <li>专属模板支持</li>
+                        </ul>
+                        <button class="btn-pricing" data-open-payment="studio">联系开通</button>
+                    </article>
+                </div>
+                <div class="credit-packs">
+                    <span>积分包</span>
+                    <button data-open-payment="pack200">¥29 / 200 积分</button>
+                    <button data-open-payment="pack600">¥79 / 600 积分</button>
+                    <button data-open-payment="pack1500">¥199 / 1500 积分</button>
+                    <button data-open-payment="pack6000">¥599 / 6000 积分</button>
+                </div>
+                <div class="pricing-contact-showcase">
+                    <img src="assets/yc-ai-lab-contact-card.png" alt="YC AI LAB 联系方式二维码">
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="faq section">
+            <div class="container faq-grid">
+                <div>
+                    <p class="eyebrow">FAQ</p>
+                    <h2>常见问题</h2>
+                </div>
+                <div class="faq-list">
+                    <details open>
+                        <summary>生成结果可以用于商业场景吗？</summary>
+                        <p>请以你购买时的订单说明、模板说明和素材权利状态为准；涉及品牌、人物肖像或第三方素材时，需自行确认已取得必要授权。</p>
+                    </details>
+                    <details>
+                        <summary>宠物拍立得需要什么照片？</summary>
+                        <p>建议使用单只宠物、正脸或半身、光线正常、无遮挡的清晰照片。</p>
+                    </details>
+                    <details>
+                        <summary>积分怎么扣？</summary>
+                        <p>每个模板生成前会显示消耗积分。图片通常 4-8 积分，视频通常 20 积分起。生成失败不应实际消耗积分；如已预扣或误扣会自动退回。</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <a class="logo" href="#home" aria-label="YCImage 首页"><span class="logo-mark"><img src="assets/ycimage-logo.svg" alt=""></span><span>YCImage</span></a>
+                <p>国内版 AI 模板创作平台。选模板、传照片、出成品。</p>
+            </div>
+            <div class="footer-links">
+                <a href="#templates">模板广场</a>
+                <a href="#pricing">定价</a>
+                <a href="legal.html">合规中心</a>
+                <a href="terms.html">用户协议</a>
+                <a href="privacy.html">隐私政策</a>
+                <a href="refund.html">退款政策</a>
+                <a href="content-policy.html">内容规则</a>
+                <button data-open-account>账户中心</button>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="modal" id="paymentModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="paymentModalTitle" tabindex="-1">
+        <div class="modal-content payment-drawer">
+            <div class="modal-header">
+                <h3 id="paymentModalTitle">开通方案</h3>
+                <button class="btn-close" data-close-payment aria-label="关闭">×</button>
+            </div>
+            <div class="payment-info">
+                <div class="payment-plan">
+                    <span id="planName">创作者版</span>
+                    <strong>¥<span id="planPrice">99</span></strong>
+                </div>
+                <p class="payment-quote-note" id="paymentQuoteNote"></p>
+                <p>选择微信或支付宝创建 MPAY 支付订单，生成专属二维码后扫码支付；如自动到账暂不可用，可将订单号发给客服核验开通。</p>
+            </div>
+            <div class="payment-methods">
+                <button class="payment-method active" type="button" data-method="wechat">微信支付</button>
+                <button class="payment-method" type="button" data-method="alipay">支付宝</button>
+            </div>
+            <div class="qrcode-container" id="qrcodeArea">
+                <div class="qrcode-placeholder">MPAY</div>
+                <p id="qrcodeHint">创建订单后生成本单专属支付二维码</p>
+            </div>
+            <div class="payment-contact">
+                支付状态：<strong id="paymentContactValue">等待创建订单</strong>
+            </div>
+            <button class="btn btn-primary btn-full" type="button" id="paymentAction">立即创建支付二维码</button>
+            <p class="auth-hint">订单创建后请使用微信或支付宝扫码支付；支付成功后通常会自动识别并到账，如未到账请联系客服核验开通。支付、退款与内容使用规则请查看 <a href="payment-security.html" target="_blank" rel="noreferrer">支付与信息安全说明</a>、<a href="refund.html" target="_blank" rel="noreferrer">退款政策</a> 和 <a href="terms.html" target="_blank" rel="noreferrer">用户协议</a>。</p>
+        </div>
+    </div>
+
+    <div class="modal" id="accountModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="accountModalTitle" tabindex="-1">
+        <div class="modal-content account-panel">
+            <div class="modal-header">
+                <h3 id="accountModalTitle">登录/注册</h3>
+                <button class="btn-close" data-close-account aria-label="关闭">×</button>
+            </div>
+            <div class="auth-view active" id="authGuestView">
+                <div class="auth-tabs" role="tablist" aria-label="登录或注册">
+                    <button class="active" id="loginTab" type="button" role="tab" data-auth-tab="login" aria-selected="true" aria-controls="loginForm">登录</button>
+                    <button id="registerTab" type="button" role="tab" data-auth-tab="register" aria-selected="false" aria-controls="registerForm">注册</button>
+                </div>
+                <form class="auth-form active" id="loginForm" role="tabpanel" aria-labelledby="loginTab">
+                    <label>邮箱
+                        <input type="email" id="loginEmail" autocomplete="email" placeholder="name@example.com" required>
+                    </label>
+                    <label>密码
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="请输入密码" required>
+                    </label>
+                    <button class="btn btn-primary btn-full" type="submit">登录</button>
+                    <p class="auth-hint" id="loginHint">请使用邮箱和密码登录。</p>
+                </form>
+                <form class="auth-form" id="registerForm" role="tabpanel" aria-labelledby="registerTab" hidden>
+                    <label>邮箱
+                        <input type="email" id="registerEmail" autocomplete="email" placeholder="name@example.com" required>
+                    </label>
+                    <label>密码
+                        <input type="password" id="registerPassword" autocomplete="new-password" placeholder="至少 8 位，含大小写和数字" required>
+                    </label>
+                    <label>确认密码
+                        <input type="password" id="registerConfirmPassword" autocomplete="new-password" placeholder="再次输入密码" required>
+                    </label>
+                    <label>邀请码
+                        <input type="text" id="registerInviteCode" autocomplete="off" placeholder="可选，填写好友邀请码">
+                    </label>
+                    <label>昵称
+                        <input type="text" id="registerDisplayName" autocomplete="nickname" placeholder="可选">
+                    </label>
+                    <button class="btn btn-primary btn-full" type="submit">注册并领取 100 积分</button>
+                    <p class="auth-hint" id="registerHint">密码需包含大写字母、小写字母和数字。注册即表示你已阅读并同意 <a href="terms.html" target="_blank" rel="noreferrer">用户协议</a>、<a href="privacy.html" target="_blank" rel="noreferrer">隐私政策</a>、<a href="refund.html" target="_blank" rel="noreferrer">退款政策</a> 和 <a href="content-policy.html" target="_blank" rel="noreferrer">内容规则</a>。</p>
+                </form>
+            </div>
+            <div class="auth-view" id="authAccountView">
+                <div class="account-profile">
+                    <div>
+                        <span>当前账户</span>
+                        <strong id="accountName">未登录</strong>
+                    </div>
+                    <button class="btn btn-secondary" type="button" id="logoutAccount">退出登录</button>
+                </div>
+                <div class="account-grid">
+                    <article><span>我的积分</span><strong id="accountCredits">--</strong></article>
+                    <article><span>生成记录</span><strong id="accountWorks">--</strong></article>
+                    <article><span>已收藏模板</span><strong id="accountFavorites">--</strong></article>
+                    <article><span>会员状态</span><strong id="accountMembership">--</strong></article>
+                </div>
+                <div class="invite-panel">
+                    <span>我的邀请码</span>
+                    <div class="invite-code-row">
+                        <strong id="accountInviteCode">--</strong>
+                        <button class="btn btn-secondary" type="button" id="copyInviteCode">复制</button>
+                    </div>
+                    <p id="accountInviteMeta">好友通过邀请码注册后，你获得 100 积分。</p>
+                </div>
+                <div class="account-actions">
+                    <a href="account.html" class="btn btn-primary">进入个人中心</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/vendor/qrcode.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

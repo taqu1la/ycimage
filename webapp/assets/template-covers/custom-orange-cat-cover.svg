@@ -1,0 +1,34 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="72" fill="#FCFAF6"/>
+  <rect x="60" y="60" width="904" height="904" rx="56" fill="url(#bg)" stroke="#E9DFC9" stroke-width="4"/>
+  <circle cx="512" cy="462" r="214" fill="#F2C27A"/>
+  <ellipse cx="426" cy="312" rx="56" ry="78" transform="rotate(-24 426 312)" fill="#E6A85A"/>
+  <ellipse cx="598" cy="312" rx="56" ry="78" transform="rotate(24 598 312)" fill="#E6A85A"/>
+  <ellipse cx="434" cy="474" rx="34" ry="42" fill="#2E2A26"/>
+  <ellipse cx="590" cy="474" rx="34" ry="42" fill="#2E2A26"/>
+  <ellipse cx="512" cy="560" rx="84" ry="68" fill="#FFF8EE"/>
+  <path d="M512 516C542 516 564 534 564 558C564 582 542 602 512 602C482 602 460 582 460 558C460 534 482 516 512 516Z" fill="#F7E7CF"/>
+  <path d="M485 566C497 553 527 553 539 566" stroke="#A66238" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="478" cy="554" r="10" fill="#A66238"/>
+  <circle cx="546" cy="554" r="10" fill="#A66238"/>
+  <path d="M358 538L250 520" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M360 570L236 570" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M358 602L250 620" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M666 538L774 520" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M664 570L788 570" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M666 602L774 620" stroke="#B88B5A" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="426" cy="534" rx="26" ry="16" fill="#F3B5A7" fill-opacity="0.75"/>
+  <ellipse cx="598" cy="534" rx="26" ry="16" fill="#F3B5A7" fill-opacity="0.75"/>
+  <path d="M224 188C268 154 318 136 372 134" stroke="#F0D7AE" stroke-width="16" stroke-linecap="round"/>
+  <path d="M760 188C716 154 666 136 612 134" stroke="#F0D7AE" stroke-width="16" stroke-linecap="round"/>
+  <path d="M188 292C214 246 250 210 296 184" stroke="#F6E5C4" stroke-width="14" stroke-linecap="round"/>
+  <path d="M836 292C810 246 774 210 728 184" stroke="#F6E5C4" stroke-width="14" stroke-linecap="round"/>
+  <text x="512" y="816" text-anchor="middle" fill="#7D5D3D" font-size="72" font-family="'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700">极简橘猫头像</text>
+  <text x="512" y="880" text-anchor="middle" fill="#A88A6A" font-size="30" font-family="'Microsoft YaHei', 'PingFang SC', sans-serif">白底 · 柔和棚拍光 · 高清细节</text>
+  <defs>
+    <linearGradient id="bg" x1="512" y1="60" x2="512" y2="964" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDFC"/>
+      <stop offset="1" stop-color="#F6F0E6"/>
+    </linearGradient>
+  </defs>
+</svg>

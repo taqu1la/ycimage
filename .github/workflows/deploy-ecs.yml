@@ -1,0 +1,79 @@
+name: Deploy YCImage To ECS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-ecs
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          test -n "${{ secrets.ECS_HOST }}"
+          test -n "${{ secrets.ECS_USER }}"
+          test -n "${{ secrets.ECS_SSH_KEY }}"
+
+      - name: Prepare SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          cat <<'EOF' > ~/.ssh/id_ed25519
+          ${{ secrets.ECS_SSH_KEY }}
+          EOF
+          chmod 600 ~/.ssh/id_ed25519
+          ECS_PORT="${{ secrets.ECS_PORT }}"
+          if [ -z "$ECS_PORT" ]; then
+            ECS_PORT=22
+          fi
+          echo "ECS_PORT=$ECS_PORT" >> "$GITHUB_ENV"
+          ssh-keyscan -p "$ECS_PORT" -H "${{ secrets.ECS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Prepare remote directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p "$ECS_PORT" -i ~/.ssh/id_ed25519 "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}" "mkdir -p /opt/ycimage/current /etc/ycimage"
+
+      - name: Sync project to ECS
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            --exclude-from="tools/linux/rsync-excludes.txt" \
+            -e "ssh -p $ECS_PORT -i ~/.ssh/id_ed25519" \
+            ./ "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}:/opt/ycimage/current/"
+
+      - name: Upload runtime env file
+        if: ${{ secrets.YCIMAGE_ENV_FILE != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat <<'EOF' > /tmp/ycimage.env
+          ${{ secrets.YCIMAGE_ENV_FILE }}
+          EOF
+          scp -P "$ECS_PORT" -i ~/.ssh/id_ed25519 /tmp/ycimage.env "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}:/etc/ycimage/ycimage.env"
+          ssh -p "$ECS_PORT" -i ~/.ssh/id_ed25519 "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}" "chmod 600 /etc/ycimage/ycimage.env"
+
+      - name: Apply runtime config and restart services
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p "$ECS_PORT" -i ~/.ssh/id_ed25519 "${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}" "
+            chmod +x /opt/ycimage/current/tools/linux/*.sh &&
+            /opt/ycimage/current/tools/linux/bootstrap_ecs.sh &&
+            /opt/ycimage/current/tools/linux/backup_ycimage.sh backup &&
+            YCIMAGE_APP_ROOT=/opt/ycimage/current /opt/ycimage/current/tools/linux/apply_release.sh
+          "
