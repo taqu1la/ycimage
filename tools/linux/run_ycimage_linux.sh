@@ -5,7 +5,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ENV_FILE="${YCIMAGE_ENV_FILE:-/etc/ycimage/ycimage.env}"
-PYTHON_BIN="${YCIMAGE_PYTHON_BIN:-python3}"
 LOG_DIR="${YCIMAGE_LOG_DIR:-/var/log/ycimage}"
 
 mkdir -p "$LOG_DIR"
@@ -19,6 +18,7 @@ fi
 
 APP_HOST="${APP_HOST:-127.0.0.1}"
 APP_PORT="${APP_PORT:-4178}"
+PYTHON_BIN="${YCIMAGE_PYTHON_BIN:-python3}"
 YCIMAGE_DB_PATH="${YCIMAGE_DB_PATH:-$ROOT_DIR/backend/data/app.db}"
 
 if [[ "${YCIMAGE_ENV:-}" == "production" ]]; then
