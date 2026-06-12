@@ -30,9 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           install -d -m 700 ~/.ssh
-          cat > ~/.ssh/id_ed25519 <<'EOF'
-${{ secrets.ECS_SSH_KEY }}
-EOF
+          printf '%s\n' "${{ secrets.ECS_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ECS_PORT="${{ secrets.ECS_PORT }}"
           if [ -z "$ECS_PORT" ]; then
