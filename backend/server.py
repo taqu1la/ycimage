@@ -7638,8 +7638,9 @@ def run_sync() -> dict:
         build_stdout = f"Skipped Node build because node is not installed; using existing {local_db.relative_to(ROOT)}"
     else:
         raise RuntimeError("Node.js is required to build template data and no existing local-db.js was found")
+    sync_db_path = env.get("YCIMAGE_DB_PATH") or str(DB_PATH)
     db_sync = subprocess.run(
-        [sys.executable, str(SYNC_SCRIPT)],
+        [sys.executable, str(SYNC_SCRIPT), "--db", sync_db_path],
         cwd=ROOT,
         env=env,
         text=True,
