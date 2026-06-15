@@ -211,6 +211,11 @@ async function apiSend(method, path, payload = {}) {
     });
     if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        const message = String(data.message || data.error || "");
+        if (response.status === 403 && message.includes("Admin password confirmation failed")) {
+            forgetAdminPassword();
+            data.message = "Admin password confirmation failed. Please enter the current admin password again.";
+        }
         throw buildApiError(response, data);
     }
     return response.json();
@@ -1415,9 +1420,9 @@ async function withAdminPassword(payload = {}, reason = "sensitive admin action"
     const nowTs = Date.now();
     let password = adminPasswordCache.expiresAt > nowTs ? adminPasswordCache.value : "";
     if (!password) {
-        password = window.prompt(`璇疯緭鍏ョ鐞嗗憳褰撳墠瀵嗙爜浠ョ‘璁わ細${reason}`) || "";
+        password = window.prompt(`Confirm admin password to ${reason}.`) || "";
         if (!password.trim()) {
-            throw new Error("绠＄悊鍛樺瘑鐮佺‘璁ゅ凡鍙栨秷");
+            throw new Error("Admin password confirmation is required.");
         }
         adminPasswordCache = { value: password, expiresAt: nowTs + 5 * 60 * 1000 };
     }

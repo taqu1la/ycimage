@@ -7607,21 +7607,15 @@ class AppHandler(BaseHTTPRequestHandler):
 
 
 def run_sync() -> dict:
-    if not REPO_SYNC_SCRIPT.exists():
-        raise RuntimeError(f"Missing sync script: {REPO_SYNC_SCRIPT}")
+    build_script = ROOT / "tools" / "build-awesome-db.mjs"
+    if not build_script.exists():
+        raise RuntimeError(f"Missing template build script: {build_script}")
     if not SYNC_SCRIPT.exists():
         raise RuntimeError(f"Missing database sync script: {SYNC_SCRIPT}")
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
-    repo = subprocess.run(
-        [
-            "powershell",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            str(REPO_SYNC_SCRIPT),
-        ],
+    build = subprocess.run(
+        ["node", str(build_script)],
         cwd=ROOT,
         env=env,
         text=True,
@@ -7629,9 +7623,9 @@ def run_sync() -> dict:
         timeout=240,
         check=False,
     )
-    if repo.returncode != 0:
-        message = (repo.stderr or repo.stdout or "GitHub sync failed").strip()
-        raise RuntimeError(f"GitHub sync failed: {message}")
+    if build.returncode != 0:
+        message = (build.stderr or build.stdout or "Template database build failed").strip()
+        raise RuntimeError(f"Template database build failed: {message}")
     db_sync = subprocess.run(
         [sys.executable, str(SYNC_SCRIPT)],
         cwd=ROOT,
@@ -7645,8 +7639,8 @@ def run_sync() -> dict:
         message = (db_sync.stderr or db_sync.stdout or "Database sync failed").strip()
         raise RuntimeError(f"Database sync failed: {message}")
     return {
-        "repoOutput": repo.stdout.strip()[-2000:],
-        "repoError": repo.stderr.strip()[-2000:],
+        "repoOutput": build.stdout.strip()[-2000:],
+        "repoError": build.stderr.strip()[-2000:],
         "dbOutput": db_sync.stdout.strip()[-2000:],
         "dbError": db_sync.stderr.strip()[-2000:],
         "syncedAt": now(),
