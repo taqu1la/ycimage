@@ -21,21 +21,21 @@ const CATEGORY_LABELS = {
 };
 
 const STATUS_LABELS = {
-    queued: ["Queued", "neutral"],
-    running: ["Running", "warning"],
-    success: ["Success", "success"],
-    failed: ["Failed", "danger"],
-    review: ["In review", "warning"],
-    enabled: ["Enabled", "success"],
-    hidden: ["Hidden", "neutral"],
-    archived: ["Archived", "neutral"],
-    paid: ["Paid", "success"],
-    pending: ["Pending", "warning"],
-    refunded: ["Refunded", "danger"],
-    approved: ["Approved", "success"],
-    rejected: ["Rejected", "danger"],
-    manual: ["Manual", "neutral"],
-    escalated: ["Escalated", "danger"]
+    queued: ["排队中", "neutral"],
+    running: ["生成中", "warning"],
+    success: ["成功", "success"],
+    failed: ["失败", "danger"],
+    review: ["待审核", "warning"],
+    enabled: ["已启用", "success"],
+    hidden: ["已隐藏", "neutral"],
+    archived: ["已归档", "neutral"],
+    paid: ["已支付", "success"],
+    pending: ["待处理", "warning"],
+    refunded: ["已退款", "danger"],
+    approved: ["已通过", "success"],
+    rejected: ["已拒绝", "danger"],
+    manual: ["人工处理", "neutral"],
+    escalated: ["已升级", "danger"]
 };
 
 let adminState = createEmptyState();
@@ -824,33 +824,33 @@ function renderTemplates() {
             <div class="template-admin-body">
                 <div class="template-admin-meta">
                     <span>${escapeHtml(template.categoryLabel || getCategoryLabel(template.category))}</span>
-                    <span>${template.paramCount || 0} params</span>
+                    <span>${template.paramCount || 0} 个参数</span>
                 </div>
                 <h3>${escapeHtml(template.title)}</h3>
                 <div class="template-admin-flags">
-                    <span class="status-pill ${template.enabled === false ? "neutral" : "success"}">${template.enabled === false ? "Hidden" : "Enabled"}</span>
-                    ${template.featured ? `<span class="status-pill warning">Homepage</span>` : ""}
-                    ${template.source === "custom" ? `<span class="status-pill neutral">Manual</span>` : `<span class="status-pill neutral">GitHub</span>`}
+                    <span class="status-pill ${template.enabled === false ? "neutral" : "success"}">${template.enabled === false ? "已隐藏" : "已启用"}</span>
+                    ${template.featured ? `<span class="status-pill warning">首页推荐</span>` : ""}
+                    ${template.source === "custom" ? `<span class="status-pill neutral">手动</span>` : `<span class="status-pill neutral">GitHub</span>`}
                 </div>
                 <div class="template-admin-meta">
-                    <span>${template.creditCost || 5} credits</span>
-                    <span>${template.usageToday || 0} uses</span>
+                    <span>${template.creditCost || 5} 积分</span>
+                    <span>${template.usageToday || 0} 次使用</span>
                 </div>
                 <div class="inline-actions" style="margin-top:10px">
-                    <button type="button" data-action="edit-template" data-id="${escapeAttr(template.id)}">Edit</button>
-                    <button type="button" data-action="toggle-template" data-id="${escapeAttr(template.id)}">${template.enabled === false ? "Enable" : "Hide"}</button>
-                    <button type="button" data-action="feature-template" data-id="${escapeAttr(template.id)}">${template.featured ? "Remove homepage" : "Add homepage"}</button>
-                    <button type="button" data-action="pin-template" data-id="${escapeAttr(template.id)}">Pin hot</button>
-                    <button type="button" data-action="hero-slot-1" data-id="${escapeAttr(template.id)}">Hero 1</button>
-                    <button type="button" data-action="hero-slot-2" data-id="${escapeAttr(template.id)}">Hero 2</button>
-                    <button type="button" data-action="hero-slot-3" data-id="${escapeAttr(template.id)}">Hero 3</button>
+                    <button type="button" data-action="edit-template" data-id="${escapeAttr(template.id)}">编辑</button>
+                    <button type="button" data-action="toggle-template" data-id="${escapeAttr(template.id)}">${template.enabled === false ? "启用" : "隐藏"}</button>
+                    <button type="button" data-action="feature-template" data-id="${escapeAttr(template.id)}">${template.featured ? "移出首页" : "加入首页"}</button>
+                    <button type="button" data-action="pin-template" data-id="${escapeAttr(template.id)}">置顶热门</button>
+                    <button type="button" data-action="hero-slot-1" data-id="${escapeAttr(template.id)}">头图 1</button>
+                    <button type="button" data-action="hero-slot-2" data-id="${escapeAttr(template.id)}">头图 2</button>
+                    <button type="button" data-action="hero-slot-3" data-id="${escapeAttr(template.id)}">头图 3</button>
                 </div>
             </div>
         </article>
     `;
-    }).join("") : `<div class="empty-admin">No matching templates</div>`;
+    }).join("") : `<div class="empty-admin">没有匹配的模板</div>`;
 
-    byId("templatePageInfo").textContent = `Page ${templateState.page} / ${totalPages}, ${filtered.length} total`;
+    byId("templatePageInfo").textContent = `第 ${templateState.page} / ${totalPages} 页，共 ${filtered.length} 个`;
     byId("templatePrev").disabled = templateState.page <= 1;
     byId("templateNext").disabled = templateState.page >= totalPages;
 
@@ -874,7 +874,7 @@ function renderHomeTemplateSlots() {
     if (quickLimit) quickLimit.value = limit;
 
     if (!featured.length) {
-        slots.innerHTML = `<div class="empty-admin">No homepage templates yet. Add one from a template card below.</div>`;
+        slots.innerHTML = `<div class="empty-admin">还没有首页模板，请从下方模板卡片加入。</div>`;
         return;
     }
 
@@ -887,11 +887,11 @@ function renderHomeTemplateSlots() {
         <article class="home-template-slot">
             ${coverMarkup}
             <b>${index + 1}. ${escapeHtml(template.title)}</b>
-            <small>${escapeHtml(template.categoryLabel || getCategoryLabel(template.category))} - ${Number(template.sortScore || 0).toFixed(0)} weight</small>
+            <small>${escapeHtml(template.categoryLabel || getCategoryLabel(template.category))} - ${Number(template.sortScore || 0).toFixed(0)} 权重</small>
             <div class="inline-actions">
-                <button type="button" data-hot-action="up" data-id="${escapeAttr(template.id)}" ${index === 0 ? "disabled" : ""}>Up</button>
-                <button type="button" data-hot-action="down" data-id="${escapeAttr(template.id)}" ${index === featured.length - 1 ? "disabled" : ""}>Down</button>
-                <button type="button" data-hot-action="remove" data-id="${escapeAttr(template.id)}">Remove</button>
+                <button type="button" data-hot-action="up" data-id="${escapeAttr(template.id)}" ${index === 0 ? "disabled" : ""}>上移</button>
+                <button type="button" data-hot-action="down" data-id="${escapeAttr(template.id)}" ${index === featured.length - 1 ? "disabled" : ""}>下移</button>
+                <button type="button" data-hot-action="remove" data-id="${escapeAttr(template.id)}">移除</button>
             </div>
         </article>
     `;
@@ -1175,6 +1175,38 @@ function renderJobs() {
             </tr>
         `).join("");
     byId("jobRows").innerHTML = rows || `<tr><td colspan="7">鏆傛棤浠诲姟</td></tr>`;
+    byId("jobRows").querySelectorAll("[data-job-action]").forEach(button => {
+        button.addEventListener("click", () => updateJobStatus(button.dataset.id, button.dataset.jobAction));
+    });
+}
+
+function renderJobs() {
+    const status = byId("jobStatusFilter")?.value || "all";
+    const model = byId("jobModelFilter")?.value || "all";
+    const query = byId("jobSearch")?.value?.trim().toLowerCase() || "";
+    const modelMap = Object.fromEntries(adminState.models.map(item => [item.id, item.name]));
+    const rows = adminState.jobs
+        .filter(job => status === "all" || job.status === status)
+        .filter(job => model === "all" || job.model === model)
+        .filter(job => !query || [job.id, job.jobNo, job.user, job.templateTitle].join(" ").toLowerCase().includes(query))
+        .map(job => `
+            <tr>
+                <td><strong>${escapeHtml(job.jobNo || job.id)}</strong><br><span style="color:#778197">${escapeHtml(formatTime(job.createdAt))}</span></td>
+                <td>${escapeHtml(job.user)}</td>
+                <td>${escapeHtml(job.templateTitle)}<br><span style="color:#778197">${escapeHtml(modelMap[job.model] || job.model)}</span></td>
+                <td>${renderStatus(job.status)}${job.error ? `<br><span style="color:#b42318">${escapeHtml(job.error)}</span>` : ""}</td>
+                <td>${escapeHtml(job.latency)}</td>
+                <td>${job.cost} 积分</td>
+                <td>
+                    <div class="inline-actions">
+                        <button type="button" data-job-action="success" data-id="${escapeAttr(job.id)}">标记成功</button>
+                        <button type="button" data-job-action="review" data-id="${escapeAttr(job.id)}">送审</button>
+                        <button type="button" data-job-action="failed" data-id="${escapeAttr(job.id)}">标记失败</button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+    byId("jobRows").innerHTML = rows || `<tr><td colspan="7">暂无任务</td></tr>`;
     byId("jobRows").querySelectorAll("[data-job-action]").forEach(button => {
         button.addEventListener("click", () => updateJobStatus(button.dataset.id, button.dataset.jobAction));
     });
