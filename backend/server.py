@@ -18,6 +18,7 @@ import subprocess
 import sys
 import time
 import uuid
+import shutil
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -7608,24 +7609,35 @@ class AppHandler(BaseHTTPRequestHandler):
 
 def run_sync() -> dict:
     build_script = ROOT / "tools" / "build-awesome-db.mjs"
+    local_db = ROOT / "webapp" / "assets" / "awesome-gpt-image-2" / "local-db.js"
     if not build_script.exists():
         raise RuntimeError(f"Missing template build script: {build_script}")
     if not SYNC_SCRIPT.exists():
         raise RuntimeError(f"Missing database sync script: {SYNC_SCRIPT}")
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
-    build = subprocess.run(
-        ["node", str(build_script)],
-        cwd=ROOT,
-        env=env,
-        text=True,
-        capture_output=True,
-        timeout=240,
-        check=False,
-    )
-    if build.returncode != 0:
-        message = (build.stderr or build.stdout or "Template database build failed").strip()
-        raise RuntimeError(f"Template database build failed: {message}")
+    build_stdout = ""
+    build_stderr = ""
+    node_bin = shutil.which("node")
+    if node_bin:
+        build = subprocess.run(
+            [node_bin, str(build_script)],
+            cwd=ROOT,
+            env=env,
+            text=True,
+            capture_output=True,
+            timeout=240,
+            check=False,
+        )
+        build_stdout = build.stdout
+        build_stderr = build.stderr
+        if build.returncode != 0:
+            message = (build.stderr or build.stdout or "Template database build failed").strip()
+            raise RuntimeError(f"Template database build failed: {message}")
+    elif local_db.exists():
+        build_stdout = f"Skipped Node build because node is not installed; using existing {local_db.relative_to(ROOT)}"
+    else:
+        raise RuntimeError("Node.js is required to build template data and no existing local-db.js was found")
     db_sync = subprocess.run(
         [sys.executable, str(SYNC_SCRIPT)],
         cwd=ROOT,
@@ -7639,8 +7651,8 @@ def run_sync() -> dict:
         message = (db_sync.stderr or db_sync.stdout or "Database sync failed").strip()
         raise RuntimeError(f"Database sync failed: {message}")
     return {
-        "repoOutput": build.stdout.strip()[-2000:],
-        "repoError": build.stderr.strip()[-2000:],
+        "repoOutput": build_stdout.strip()[-2000:],
+        "repoError": build_stderr.strip()[-2000:],
         "dbOutput": db_sync.stdout.strip()[-2000:],
         "dbError": db_sync.stderr.strip()[-2000:],
         "syncedAt": now(),
