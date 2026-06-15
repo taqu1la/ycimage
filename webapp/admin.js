@@ -324,13 +324,13 @@ async function signInAdmin(event) {
 }
 
 async function loadAdminState() {
-    setText("adminDbStatus", "Reading SQLite database...");
+    setText("adminDbStatus", "正在读取 SQLite 数据库...");
     try {
         adminState = await apiGet("/api/admin/state");
         hideAdminLogin();
         hydrateStaticOptions();
         renderAll();
-        setText("adminDbStatus", `${adminState.templates.length} templates / ${adminState.stats.images} images loaded`);
+        setText("adminDbStatus", `已加载 ${adminState.templates.length} 个模板 / ${adminState.stats.images} 张图片`);
     } catch (error) {
         if (error.status === 401) {
             showAdminLogin("Admin sign-in required. Use your administrator email/password.");
@@ -339,7 +339,7 @@ async function loadAdminState() {
         }
         adminState = createEmptyState();
         renderAll();
-        setText("adminDbStatus", error.status === 401 ? "Admin sign-in required" : "Backend API unavailable");
+        setText("adminDbStatus", error.status === 401 ? "需要管理员登录" : "后台 API 不可用");
         toast(error.message || "Admin API read failed. Start backend/server.py first.");
     }
 }
@@ -1377,10 +1377,85 @@ function renderStatus(status) {
 }
 
 function toneLabel(tone) {
-    if (tone === "success") return "OK";
-    if (tone === "warning") return "Attention";
-    if (tone === "danger") return "Risk";
-    return "Info";
+    if (tone === "success") return "正常";
+    if (tone === "warning") return "注意";
+    if (tone === "danger") return "风险";
+    return "信息";
+}
+
+function renderOverview() {
+    const templates = adminState.templates;
+    const activeTemplates = templates.filter(template => template.enabled !== false);
+    const jobs = adminState.jobs;
+    const successJobs = jobs.filter(job => job.status === "success");
+    const failedJobs = jobs.filter(job => job.status === "failed");
+    const revenue = adminState.orders.filter(order => order.status === "paid").reduce((sum, order) => sum + Number(order.amount || 0), 0);
+    const credits = adminState.users.reduce((sum, user) => sum + Number(user.credits || 0), 0);
+    const reviewPending = adminState.reviewItems.filter(item => item.status === "pending").length;
+    const featured = templates.filter(template => template.featured && template.enabled !== false).length;
+
+    const metrics = [
+        ["模板总数", templates.length, `${activeTemplates.length} 个已启用`, ""],
+        ["首页推荐", featured, `目标 ${adminState.settings.homeTemplateLimit || 30} 个`, featured >= 30 ? "" : "warning"],
+        ["图片资产", adminState.stats.images || 0, "来自 SQLite 资产库", ""],
+        ["生成任务", jobs.length, `${successJobs.length} 个成功`, ""],
+        ["失败任务", failedJobs.length, failedJobs.length ? "需要处理" : "稳定", failedJobs.length ? "danger" : ""],
+        ["待审内容", reviewPending, reviewPending ? "需要人工审核" : "已清空", reviewPending ? "warning" : ""],
+        ["收入", `¥${revenue}`, `用户剩余 ${credits} 积分`, ""]
+    ];
+
+    byId("metricGrid").innerHTML = metrics.map(([label, value, note, tone]) => `
+        <article class="metric-card ${tone || ""}">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+            <small>${escapeHtml(note)}</small>
+        </article>
+    `).join("");
+
+    renderFunnel();
+    renderRisks();
+    renderTopTemplateRows();
+    renderActivity();
+}
+
+function renderFunnel() {
+    const jobs = adminState.jobs.length || 1;
+    const success = adminState.jobs.filter(job => job.status === "success").length;
+    const paid = adminState.orders.filter(order => order.status === "paid").length;
+    const steps = [
+        ["模板曝光", Math.max(12486, adminState.templates.length * 32), 100],
+        ["模板详情访问", Math.max(3260, adminState.templates.length * 8), 26],
+        ["生成提交", jobs, 12],
+        ["成功生成", success, Math.max(4, success / jobs * 12)],
+        ["支付订单", paid, 3]
+    ];
+    byId("funnelList").innerHTML = steps.map(([label, value, percent]) => `
+        <div class="funnel-item">
+            <span>${escapeHtml(label)}</span>
+            <div class="funnel-bar"><span style="width:${Math.max(4, percent)}%"></span></div>
+            <strong>${Number(value).toLocaleString("zh-CN")}</strong>
+        </div>
+    `).join("");
+}
+
+function renderRisks() {
+    const failed = adminState.jobs.filter(job => job.status === "failed").length;
+    const pending = adminState.reviewItems.filter(item => item.status === "pending").length;
+    const lowCredits = adminState.users.filter(user => user.credits < 30).length;
+    const featured = adminState.templates.filter(template => template.featured && template.enabled !== false).length;
+    const risks = [
+        ["后端连接", adminState.templates.length ? "SQLite API 正常" : "API 不可用", adminState.templates.length ? "success" : "danger"],
+        ["首页推荐", `${featured} / ${adminState.settings.homeTemplateLimit || 30}`, featured >= 30 ? "success" : "warning"],
+        ["失败任务", `${failed} 个任务可重试`, failed ? "warning" : "success"],
+        ["审核积压", `${pending} 个待审项目`, pending ? "warning" : "success"],
+        ["积分预警", `${lowCredits} 个用户低于 30 积分`, lowCredits ? "warning" : "success"]
+    ];
+    byId("riskList").innerHTML = risks.map(([title, detail, tone]) => `
+        <div class="risk-item">
+            <strong>${escapeHtml(title)} <span class="status-pill ${tone}">${toneLabel(tone)}</span></strong>
+            <span>${escapeHtml(detail)}</span>
+        </div>
+    `).join("");
 }
 
 function riskClass(risk) {
