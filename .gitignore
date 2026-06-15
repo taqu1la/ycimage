@@ -33,3 +33,31 @@ backend/data/*.sqlite3
 
 # Local server-side runtime copies
 backups/
+
+# Local imported reference packs and large media dumps
+webapp/assets/awesome-gpt-image-2/
+webapp/assets/apimart-video-promos/
+
+# Local screenshots, generated samples, and handoff exports
+/ScreenShot_*.png
+/ChatGPT_Image_*.png
+/*.jpg
+/YCIMAGE_*.md
+/说明文档/
+/backend/MPAY_INTEGRATION.md
+/backend/SECURITY_TODO.md
+/webapp/assets/ycimage-logo-*.svg
+
+# Local hashed backup copies from manual sync/export runs
+/-*.gitattributes
+/-*.gitignore
+/backend/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.md
+/backend/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.py
+/backend/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.sql
+/backend/scripts/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.py
+/tools/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.mjs
+/tools/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.ps1
+
+# Local-only helper drafts
+/start_server.bat
+/tools/macos/
