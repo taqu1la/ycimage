@@ -3108,6 +3108,37 @@ textarea:focus {
     min-height: 46px;
 }
 
+.captcha-row {
+    display: grid;
+    grid-template-columns: auto minmax(90px, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.captcha-row strong {
+    min-height: 46px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(248, 247, 242, 0.86);
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.captcha-row .btn {
+    min-height: 46px;
+    white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+    .captcha-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .auth-hint,
 .wechat-login-card p,
 .invite-panel p {

@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS users (
     membership_level TEXT NOT NULL DEFAULT 'free',
     status TEXT NOT NULL DEFAULT 'active',
     locale TEXT NOT NULL DEFAULT 'zh-CN',
+    registered_ip TEXT,
+    registered_user_agent TEXT,
     last_login_at TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -172,7 +172,7 @@ def effective_apimart_base_url(conn: sqlite3.Connection | None = None) -> str:
 
 APIMART_OFFICIAL_ROUTE_CODE = "gpt-image-2-official"
 APIMART_OFFICIAL_MODEL = "gpt-image-2-official"
-DEFAULT_IMAGE_ROUTE_CODE = "gpt-image-2-high"
+DEFAULT_IMAGE_ROUTE_CODE = APIMART_OFFICIAL_ROUTE_CODE
 APIMART_OFFICIAL_SIZES = ["auto", "1:1", "3:4", "4:3", "4:5", "5:4", "2:3", "3:2", "16:9", "9:16", "2:1", "1:2", "21:9", "9:21"]
 APIMART_PIXEL_SIZE_TO_RATIO = {
     "1024x1024": "1:1",
@@ -299,6 +299,7 @@ RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get("YCIMAGE_RATE_LIMIT_WINDOW_SECOND
 RATE_LIMIT_RULES = {
     "/api/auth/password-login": (8, 60),
     "/api/auth/register": (5, 60),
+    "/api/auth/captcha": (20, 60),
     "/api/auth/mobile-code": (5, 60),
     "/api/auth/logout-all": (4, 60),
     "/api/pay/orders": (10, 60),
@@ -307,6 +308,9 @@ RATE_LIMIT_RULES = {
 }
 DEFAULT_WRITE_RATE_LIMIT = (120, 60)
 RATE_LIMIT_BUCKETS: dict[tuple[str, str], list[float]] = {}
+REGISTER_IP_LIMIT_PER_HOUR = int(os.environ.get("YCIMAGE_REGISTER_IP_LIMIT_PER_HOUR", "3"))
+REGISTER_IP_LIMIT_PER_DAY = int(os.environ.get("YCIMAGE_REGISTER_IP_LIMIT_PER_DAY", "8"))
+REGISTER_CAPTCHA_TTL_SECONDS = int(os.environ.get("YCIMAGE_REGISTER_CAPTCHA_TTL_SECONDS", "600"))
 
 
 def now() -> str:
@@ -825,6 +829,101 @@ def mobile_code_matches(stored_code: str, mobile: str, purpose: str, submitted_c
     return hmac.compare_digest(submitted_code, stored_code)
 
 
+def captcha_digest(challenge_id: str, purpose: str, client_ip: str, answer: str) -> str:
+    normalized_answer = str(answer or "").strip().lower()
+    material = f"{challenge_id}:{purpose}:{client_ip}:{normalized_answer}".encode("utf-8")
+    return "hmac_sha256:" + hmac.new(secret_key_material().encode("utf-8"), material, hashlib.sha256).hexdigest()
+
+
+def captcha_answer_matches(stored_answer: str, challenge_id: str, purpose: str, client_ip: str, submitted_answer: str) -> bool:
+    submitted_answer = str(submitted_answer or "").strip()
+    if not re.fullmatch(r"-?\d{1,4}", submitted_answer):
+        return False
+    return hmac.compare_digest(str(stored_answer or ""), captcha_digest(challenge_id, purpose, client_ip, submitted_answer))
+
+
+def issue_captcha_challenge(conn: sqlite3.Connection, client_ip: str, purpose: str = "register") -> dict:
+    left = secrets.randbelow(8) + 2
+    right = secrets.randbelow(8) + 2
+    operator = "+" if secrets.randbelow(2) == 0 else "-"
+    answer = left + right if operator == "+" else left - right
+    challenge_id = uid("cap")
+    expires_at = (datetime.now(timezone.utc) + timedelta(seconds=REGISTER_CAPTCHA_TTL_SECONDS)).replace(microsecond=0).isoformat()
+    conn.execute(
+        """
+        INSERT INTO auth_captcha_challenges(
+            id, purpose, question, answer_hash, ip_address, expires_at, consumed_at, created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, NULL, ?)
+        """,
+        (
+            challenge_id,
+            purpose,
+            f"{left} {operator} {right} = ?",
+            captcha_digest(challenge_id, purpose, client_ip, str(answer)),
+            client_ip,
+            expires_at,
+            now(),
+        ),
+    )
+    return {"challengeId": challenge_id, "question": f"{left} {operator} {right} = ?", "expiresAt": expires_at}
+
+
+def verify_captcha_challenge(
+    conn: sqlite3.Connection,
+    challenge_id: str,
+    submitted_answer: str,
+    client_ip: str,
+    purpose: str = "register",
+) -> sqlite3.Row:
+    challenge_id = str(challenge_id or "").strip()
+    if not challenge_id:
+        raise ValueError("Captcha is required")
+    row = conn.execute(
+        """
+        SELECT *
+        FROM auth_captcha_challenges
+        WHERE id = ? AND purpose = ?
+        LIMIT 1
+        """,
+        (challenge_id, purpose),
+    ).fetchone()
+    if not row or row["consumed_at"] is not None:
+        raise ValueError("Captcha has expired; please refresh and try again")
+    if row["expires_at"] <= now():
+        raise ValueError("Captcha has expired; please refresh and try again")
+    if str(row["ip_address"] or "") != client_ip:
+        raise ValueError("Captcha network check failed; please refresh and try again")
+    if not captcha_answer_matches(str(row["answer_hash"]), challenge_id, purpose, client_ip, submitted_answer):
+        raise ValueError("Captcha answer is incorrect")
+    conn.execute("UPDATE auth_captcha_challenges SET consumed_at = ? WHERE id = ?", (now(), challenge_id))
+    return row
+
+
+def enforce_registration_ip_limits(conn: sqlite3.Connection, client_ip: str) -> None:
+    if not client_ip:
+        raise ValueError("Unable to verify registration network")
+    current = datetime.now(timezone.utc).replace(microsecond=0)
+    windows = [
+        (REGISTER_IP_LIMIT_PER_HOUR, current - timedelta(hours=1), "Too many registrations from this network; please try again later"),
+        (REGISTER_IP_LIMIT_PER_DAY, current - timedelta(days=1), "Daily registration limit reached for this network"),
+    ]
+    for limit, since, message in windows:
+        if limit <= 0:
+            continue
+        row = conn.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM users
+            WHERE registered_ip = ?
+              AND created_at >= ?
+            """,
+            (client_ip, since.isoformat()),
+        ).fetchone()
+        if int(row["count"] if row else 0) >= limit:
+            raise ValueError(message)
+
+
 ALLOWED_JOB_STATUS_TRANSITIONS = {
     "draft": {"queued", "cancelled"},
     "queued": {"running", "review", "failed", "cancelled"},
@@ -1039,6 +1138,17 @@ def ensure_auth_schema(conn: sqlite3.Connection) -> None:
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS auth_captcha_challenges (
+            id TEXT PRIMARY KEY,
+            purpose TEXT NOT NULL DEFAULT 'register',
+            question TEXT NOT NULL,
+            answer_hash TEXT NOT NULL,
+            ip_address TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            consumed_at TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS referral_codes (
             user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
             invite_code TEXT NOT NULL UNIQUE,
@@ -1059,6 +1169,9 @@ def ensure_auth_schema(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_auth_codes_mobile_created
         ON auth_verification_codes(mobile, created_at DESC);
 
+        CREATE INDEX IF NOT EXISTS idx_auth_captcha_ip_created
+        ON auth_captcha_challenges(ip_address, created_at DESC);
+
         CREATE TABLE IF NOT EXISTS auth_password_credentials (
             user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
             password_hash TEXT NOT NULL,
@@ -1073,6 +1186,12 @@ def ensure_auth_schema(conn: sqlite3.Connection) -> None:
     columns = {row["name"] if isinstance(row, sqlite3.Row) else row[1] for row in conn.execute("PRAGMA table_info(auth_password_credentials)").fetchall()}
     if "metadata_json" not in columns:
         conn.execute("ALTER TABLE auth_password_credentials ADD COLUMN metadata_json TEXT NOT NULL DEFAULT '{}'")
+    user_columns = {row["name"] if isinstance(row, sqlite3.Row) else row[1] for row in conn.execute("PRAGMA table_info(users)").fetchall()}
+    if "registered_ip" not in user_columns:
+        conn.execute("ALTER TABLE users ADD COLUMN registered_ip TEXT")
+    if "registered_user_agent" not in user_columns:
+        conn.execute("ALTER TABLE users ADD COLUMN registered_user_agent TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_users_registered_ip_created ON users(registered_ip, created_at DESC)")
 
 
 def migrate_plaintext_secrets(conn: sqlite3.Connection) -> None:
@@ -5356,7 +5475,7 @@ class AppHandler(BaseHTTPRequestHandler):
             return
         route_key, limit, window = route
         now_ts = time.monotonic()
-        subjects = [f"ip:{self.client_address[0]}"]
+        subjects = [f"ip:{self.request_client_ip()}"]
         token = self.bearer_token()
         if token:
             subjects.append(f"token:{hashlib.sha256(token.encode('utf-8')).hexdigest()[:16]}")
@@ -5367,6 +5486,25 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise RequestRejected(429, "Too many requests")
             recent.append(now_ts)
             RATE_LIMIT_BUCKETS[key] = recent
+
+    def request_client_ip(self) -> str:
+        peer = self.client_address[0] if self.client_address else ""
+        peer_is_loopback = False
+        try:
+            peer_is_loopback = ipaddress.ip_address(peer).is_loopback
+        except ValueError:
+            peer_is_loopback = peer in {"localhost", "::1"}
+        if peer_is_loopback:
+            forwarded = (self.headers.get("X-Real-IP") or self.headers.get("X-Forwarded-For") or "").split(",", 1)[0].strip()
+            if forwarded:
+                try:
+                    return str(ipaddress.ip_address(forwarded))
+                except ValueError:
+                    pass
+        try:
+            return str(ipaddress.ip_address(peer))
+        except ValueError:
+            return peer or "0.0.0.0"
 
     def cors_origin(self) -> str:
         origin = (self.headers.get("Origin") or "").rstrip("/")
@@ -5693,6 +5831,15 @@ class AppHandler(BaseHTTPRequestHandler):
                 self.send_json(200, {"items": list_account_invites(conn, user["id"])})
                 return
 
+            if method == "GET" and path == "/api/auth/captcha":
+                purpose = str((query.get("purpose") or ["register"])[0] or "register").strip() or "register"
+                if purpose != "register":
+                    self.send_json(400, {"error": "Invalid captcha purpose", "message": "Invalid captcha purpose"})
+                    return
+                challenge = issue_captcha_challenge(conn, self.request_client_ip(), purpose)
+                self.send_json(200, {"ok": True, **challenge})
+                return
+
             if method == "GET" and path.startswith("/api/pay/orders/"):
                 user = get_user_by_session(conn, self.bearer_token())
                 if not user:
@@ -5925,6 +6072,7 @@ class AppHandler(BaseHTTPRequestHandler):
             if method == "POST" and path == "/api/auth/register":
                 transaction_started = False
                 try:
+                    client_ip = self.request_client_ip()
                     email = normalize_email(payload.get("email"))
                     raw_mobile = str(payload.get("mobile") or "").strip()
                     mobile = normalize_mobile(raw_mobile) if raw_mobile else None
@@ -5937,8 +6085,12 @@ class AppHandler(BaseHTTPRequestHandler):
                     code = str(payload.get("code") or "").strip()
                     display_name = str(payload.get("displayName") or "").strip() or email.split("@", 1)[0]
                     invite_code = str(payload.get("inviteCode") or "").strip().upper()
+                    captcha_id = str(payload.get("captchaId") or "").strip()
+                    captcha_answer = str(payload.get("captchaAnswer") or "").strip()
                     if mobile and not code:
                         raise ValueError("Mobile verification code is required")
+                    verify_captcha_challenge(conn, captcha_id, captcha_answer, client_ip, "register")
+                    enforce_registration_ip_limits(conn, client_ip)
                     exists = conn.execute(
                         "SELECT 1 FROM users WHERE email = ? OR (? IS NOT NULL AND mobile = ?)",
                         (email, mobile, mobile),
@@ -5956,11 +6108,12 @@ class AppHandler(BaseHTTPRequestHandler):
                         """
                         INSERT INTO users(
                             id, organization_id, display_name, mobile, email, role_id,
-                            membership_level, status, locale, created_at, updated_at
+                            membership_level, status, locale, registered_ip, registered_user_agent,
+                            created_at, updated_at
                         )
-                        VALUES (?, 'org_default', ?, ?, ?, 'role_user', 'free', 'active', 'zh-CN', ?, ?)
+                        VALUES (?, 'org_default', ?, ?, ?, 'role_user', 'free', 'active', 'zh-CN', ?, ?, ?, ?)
                         """,
-                        (user_id, display_name, mobile, email, now(), now()),
+                        (user_id, display_name, mobile, email, client_ip, (self.headers.get("User-Agent") or "")[:300], now(), now()),
                     )
                     conn.execute(
                         "INSERT OR IGNORE INTO user_profiles(user_id, preferences_json) VALUES (?, '{}')",

@@ -1034,6 +1034,13 @@
                     <label>昵称
                         <input type="text" id="registerDisplayName" autocomplete="nickname" placeholder="可选">
                     </label>
+                    <label>安全验证
+                        <span class="captcha-row">
+                            <strong id="registerCaptchaQuestion">加载中...</strong>
+                            <input type="text" id="registerCaptchaAnswer" inputmode="numeric" autocomplete="off" placeholder="请输入答案" required>
+                            <button class="btn btn-secondary" type="button" id="refreshRegisterCaptcha">换一题</button>
+                        </span>
+                    </label>
                     <button class="btn btn-primary btn-full" type="submit">注册并领取 100 积分</button>
                     <p class="auth-hint" id="registerHint">密码需包含大写字母、小写字母和数字。注册即表示你已阅读并同意 <a href="terms.html" target="_blank" rel="noreferrer">用户协议</a>、<a href="privacy.html" target="_blank" rel="noreferrer">隐私政策</a>、<a href="refund.html" target="_blank" rel="noreferrer">退款政策</a> 和 <a href="content-policy.html" target="_blank" rel="noreferrer">内容规则</a>。</p>
                 </form>

@@ -118,6 +118,7 @@ let imagePollTimer = null;
 let publicSettings = {};
 let templateDataPromise = null;
 let currentAccount = null;
+let registerCaptcha = { challengeId: "", question: "" };
 let homeWorksSampleMarkup = "";
 let activeWorksFilter = "all";
 const HOME_WORK_CARD_SHAPES = ["tall", "", "", "wide", ""];
@@ -3990,6 +3991,9 @@ function initAccountModal() {
         event.preventDefault();
         registerWithEmail();
     });
+    document.getElementById("refreshRegisterCaptcha")?.addEventListener("click", () => {
+        refreshRegisterCaptcha();
+    });
     document.getElementById("copyInviteCode")?.addEventListener("click", copyInviteCode);
     document.getElementById("logoutAccount")?.addEventListener("click", logoutAccount);
 
@@ -4035,6 +4039,31 @@ function switchAuthTab(tab) {
     registerForm?.classList.toggle("active", nextTab === "register");
     if (loginForm) loginForm.hidden = nextTab !== "login";
     if (registerForm) registerForm.hidden = nextTab !== "register";
+    if (nextTab === "register") refreshRegisterCaptcha();
+}
+
+async function refreshRegisterCaptcha() {
+    const question = document.getElementById("registerCaptchaQuestion");
+    const answer = document.getElementById("registerCaptchaAnswer");
+    const refresh = document.getElementById("refreshRegisterCaptcha");
+    if (!question) return;
+    question.textContent = "加载中...";
+    if (refresh) refresh.disabled = true;
+    try {
+        const data = await apiGet("/api/auth/captcha?purpose=register");
+        registerCaptcha = {
+            challengeId: data.challengeId || "",
+            question: data.question || ""
+        };
+        question.textContent = registerCaptcha.question || "请刷新";
+        if (answer) answer.value = "";
+    } catch (error) {
+        registerCaptcha = { challengeId: "", question: "" };
+        question.textContent = "加载失败";
+        setText("registerHint", error.message || "安全验证加载失败，请稍后重试。");
+    } finally {
+        if (refresh) refresh.disabled = false;
+    }
 }
 
 async function refreshAccountState() {
@@ -4128,8 +4157,16 @@ async function registerWithEmail() {
         password,
         confirmPassword,
         inviteCode: document.getElementById("registerInviteCode")?.value?.trim(),
-        displayName: document.getElementById("registerDisplayName")?.value?.trim()
+        displayName: document.getElementById("registerDisplayName")?.value?.trim(),
+        captchaId: registerCaptcha.challengeId,
+        captchaAnswer: document.getElementById("registerCaptchaAnswer")?.value?.trim()
     };
+    if (!payload.captchaId || !payload.captchaAnswer) {
+        const message = "请先完成安全验证。";
+        setText("registerHint", message);
+        showToast(message, "error");
+        return;
+    }
     if (submit) {
         submit.disabled = true;
         submit.textContent = "注册中";
@@ -4142,6 +4179,8 @@ async function registerWithEmail() {
         closeAccountModal();
         showToast(data.message || "注册成功");
     } catch (error) {
+        await refreshRegisterCaptcha();
+        setText("registerHint", error.message || "注册失败");
         showToast(error.message || "注册失败", "error");
     } finally {
         if (submit) {

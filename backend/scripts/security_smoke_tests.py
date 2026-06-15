@@ -230,6 +230,15 @@ def login_with_password(email: str, password: str) -> str:
     return capture_auth_cookies(headers)
 
 
+def registration_captcha_payload() -> dict:
+    status, body, _ = request("GET", "/api/auth/captcha?purpose=register")
+    assert status == 200, body
+    question = str(body["question"])
+    left, operator, right, *_ = question.split()
+    answer = int(left) + int(right) if operator == "+" else int(left) - int(right)
+    return {"captchaId": body["challengeId"], "captchaAnswer": str(answer)}
+
+
 def mpay_sign(params: dict, key: str) -> str:
     parts = []
     for name in sorted(params):
@@ -346,6 +355,54 @@ def run() -> None:
             )
             server.verify_mobile_code(conn, "13800138001", "123456", "register")
             conn.commit()
+
+        status, body, _ = request(
+            "POST",
+            "/api/auth/register",
+            {
+                "email": "bot-missing-captcha@example.com",
+                "password": "Password1",
+                "confirmPassword": "Password1",
+            },
+        )
+        assert status == 400, body
+        assert "Captcha" in body.get("message", ""), body
+
+        register_payload = {
+            "email": "captcha-ok@example.com",
+            "password": "Password1",
+            "confirmPassword": "Password1",
+            "displayName": "Captcha OK",
+            **registration_captcha_payload(),
+        }
+        status, body, headers = request("POST", "/api/auth/register", register_payload)
+        assert status == 201, body
+        assert capture_auth_cookies(headers), headers
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.row_factory = sqlite3.Row
+            registered = conn.execute("SELECT registered_ip FROM users WHERE email = ?", ("captcha-ok@example.com",)).fetchone()
+            assert registered and registered["registered_ip"] == "127.0.0.1", registered
+
+        original_hour_limit = server.REGISTER_IP_LIMIT_PER_HOUR
+        try:
+            server.REGISTER_IP_LIMIT_PER_HOUR = 1
+            status, body, _ = request(
+                "POST",
+                "/api/auth/register",
+                {
+                    "email": "captcha-ip-blocked@example.com",
+                    "password": "Password1",
+                    "confirmPassword": "Password1",
+                    **registration_captcha_payload(),
+                },
+            )
+            assert status == 400, body
+            with sqlite3.connect(DB_PATH) as conn:
+                conn.row_factory = sqlite3.Row
+                blocked = conn.execute("SELECT 1 FROM users WHERE email = ?", ("captcha-ip-blocked@example.com",)).fetchone()
+                assert blocked is None, blocked
+        finally:
+            server.REGISTER_IP_LIMIT_PER_HOUR = original_hour_limit
 
         cookie_a = login("a@example.com")
         cookie_b = login("b@example.com")
