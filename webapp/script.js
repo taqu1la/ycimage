@@ -3948,7 +3948,13 @@ function setPaymentBusy(busy) {
     const action = document.getElementById("paymentAction");
     if (!action) return;
     action.disabled = busy;
-    action.textContent = busy ? "正在创建二维码..." : "立即创建支付二维码";
+    if (busy) {
+        action.textContent = "正在创建二维码...";
+    } else if (paymentState.orderNo) {
+        action.textContent = "重新创建支付二维码";
+    } else {
+        action.textContent = "立即创建支付二维码";
+    }
 }
 
 function looksLikeQrPayload(value) {
@@ -4052,6 +4058,10 @@ async function submitPaymentOrder() {
         paymentState.orderNo = data.item?.orderNo || "";
         if (data.item) setPaymentQuote(paymentState.planId, data.item);
         renderPaymentResult(data.payment || {});
+        if (paymentState.orderNo) {
+            const action = document.getElementById("paymentAction");
+            if (action) action.textContent = "重新创建支付二维码";
+        }
         if (paymentState.orderNo) {
             startPaymentPolling(paymentState.orderNo);
         } else {

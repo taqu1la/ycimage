@@ -3967,7 +3967,7 @@ def build_mpay_payment(conn: sqlite3.Connection, order: dict, channel: str) -> d
         }
 
     if pay_url:
-        return {
+        return enrich_mpay_payment_from_cashier(config, {
             "provider": "mpay",
             "channel": channel,
             "state": "pending",
@@ -3975,11 +3975,11 @@ def build_mpay_payment(conn: sqlite3.Connection, order: dict, channel: str) -> d
             "paymentUrl": pay_url,
             "providerOrderId": provider_order_id,
             "raw": data,
-            "message": "Open the payment link to complete payment. Credits will be applied after payment succeeds.",
-        }
+            "message": "请打开支付链接完成支付，支付成功后系统会自动到账。",
+        })
 
     if urlscheme:
-        return {
+        return enrich_mpay_payment_from_cashier(config, {
             "provider": "mpay",
             "channel": channel,
             "state": "pending",
@@ -3987,8 +3987,8 @@ def build_mpay_payment(conn: sqlite3.Connection, order: dict, channel: str) -> d
             "paymentUrl": urlscheme,
             "providerOrderId": provider_order_id,
             "raw": data,
-            "message": "Open the payment link to complete payment. Credits will be applied after payment succeeds.",
-        }
+            "message": "请打开支付链接完成支付，支付成功后系统会自动到账。",
+        })
 
     raise RuntimeError("MPAY did not return a usable QR code or payment link")
 
@@ -4057,6 +4057,58 @@ def mpay_query_cashier_status(config: dict, provider_order_id: str) -> dict:
         raise RuntimeError(str(data.get("msg") or data.get("message") or "MPAY cashier status returned an error"))
     payload = data.get("data")
     return payload if isinstance(payload, dict) else {}
+
+
+def mpay_query_cashier_order(config: dict, provider_order_id: str) -> dict:
+    if not provider_order_id:
+        return {}
+    base_url = str(config.get("mpayBaseUrl") or "").rstrip("/")
+    if not base_url:
+        raise RuntimeError("MPAY payment configuration is incomplete")
+    order_url = assert_public_http_url(f"{base_url}/api/cashier/pay-order?pay_no={quote(provider_order_id)}")
+    request = Request(
+        order_url,
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    try:
+        with SAFE_URL_OPENER.open(request, timeout=20) as response:
+            assert_public_http_url(response.geturl())
+            data = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="ignore")
+        raise RuntimeError(f"MPAY cashier order failed: HTTP {exc.code} {body}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"Unable to connect to MPAY cashier order: {exc.reason}") from exc
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("MPAY cashier order response is not valid JSON") from exc
+    if str(data.get("code") or "") not in {"1", "SUCCESS", "200"}:
+        raise RuntimeError(str(data.get("msg") or data.get("message") or "MPAY cashier order returned an error"))
+    payload = data.get("data")
+    return payload if isinstance(payload, dict) else {}
+
+
+def enrich_mpay_payment_from_cashier(config: dict, payment: dict) -> dict:
+    provider_order_id = str(payment.get("providerOrderId") or "").strip()
+    if not provider_order_id:
+        return payment
+    try:
+        cashier_order = mpay_query_cashier_order(config, provider_order_id)
+    except Exception:
+        return payment
+    presentation = cashier_order.get("presentation") if isinstance(cashier_order, dict) else {}
+    pay_params = presentation.get("pay_params") if isinstance(presentation, dict) else {}
+    qrcode_image = str(pay_params.get("qrcode_image") or "").strip() if isinstance(pay_params, dict) else ""
+    description = str(pay_params.get("description") or "").strip() if isinstance(pay_params, dict) else ""
+    if not qrcode_image:
+        return payment
+    return {
+        **payment,
+        "displayMode": "qrcode",
+        "qrcodeUrl": qrcode_image,
+        "paymentUrl": payment.get("paymentUrl") or qrcode_image,
+        "message": description or "请扫码完成支付，系统会自动刷新订单状态。",
+    }
 
 
 def reconcile_mpay_order(conn: sqlite3.Connection, order_row: sqlite3.Row) -> sqlite3.Row:
