@@ -4083,7 +4083,7 @@ def reconcile_mpay_order(conn: sqlite3.Connection, order_row: sqlite3.Row) -> sq
         remote_status = str(cashier_payload.get("status") or remote_status).strip()
         payload = {**payload, "cashierStatus": cashier_payload}
 
-    if remote_status == "1":
+    if remote_status == "2":
         try:
             conn.execute("BEGIN IMMEDIATE")
             locked_order = conn.execute("SELECT * FROM orders WHERE id = ? LIMIT 1", (order_row["id"],)).fetchone()
@@ -5981,7 +5981,7 @@ class AppHandler(BaseHTTPRequestHandler):
                     self.send_text(400, "fail")
                     return
                 trade_status = str(notify_payload.get("trade_status") or notify_payload.get("status") or "").upper()
-                if trade_status in {"TRADE_SUCCESS", "TRADE_FINISHED", "1", "SUCCESS", "PAID"}:
+                if trade_status in {"TRADE_SUCCESS", "TRADE_FINISHED", "2", "SUCCESS", "PAID"}:
                     try:
                         conn.execute("BEGIN IMMEDIATE")
                         locked_order = conn.execute("SELECT * FROM orders WHERE order_no = ? LIMIT 1", (order_no,)).fetchone()

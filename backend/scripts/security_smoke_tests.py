@@ -1058,6 +1058,10 @@ def run() -> None:
                 "INSERT INTO orders(id, order_no, user_id, organization_id, plan_id, amount_cents, currency, payment_channel, status, metadata_json) VALUES (?, ?, ?, ?, ?, ?, 'CNY', 'wechat', 'paid', ?)",
                 ("order_jeepay_paid", "ORD-JEEPAY-PAID", "user_a", "org_default", "plan_pack", 2900, json.dumps({"grantCredits": 200})),
             )
+            conn.execute(
+                "INSERT INTO orders(id, order_no, user_id, organization_id, plan_id, amount_cents, currency, payment_channel, payment_provider_order_id, status, metadata_json) VALUES (?, ?, ?, ?, ?, ?, 'CNY', 'wechat', ?, 'pending', ?)",
+                ("order_mpay_paying", "ORD-MPAY-PAYING", "user_a", "org_default", "plan_pack", 2900, "T-PAYING", json.dumps({"grantCredits": 200})),
+            )
             conn.commit()
 
         params = {"pid": "pid", "out_trade_no": "ORD-PAID", "money": "29.00", "trade_status": "TRADE_SUCCESS", "trade_no": "T1"}
@@ -1080,6 +1084,15 @@ def run() -> None:
         wrong_pid_params["sign"] = mpay_sign(wrong_pid_params, "secret")
         status, _, _ = request("POST", "/api/pay/notify/mpay", wrong_pid_params)
         assert status == 400, status
+        paying_status_params = {"pid": "pid", "out_trade_no": "ORD-PAID", "money": "29.00", "status": "1", "trade_no": "T-PAYING"}
+        paying_status_params["sign"] = mpay_sign(paying_status_params, "secret")
+        status, _, _ = request("POST", "/api/pay/notify/mpay", paying_status_params)
+        assert status == 200, status
+        with sqlite3.connect(DB_PATH) as conn:
+            unpaid = conn.execute("SELECT status, paid_at FROM orders WHERE id = 'order_paid'").fetchone()
+            balance_before_success = conn.execute("SELECT balance FROM credit_accounts WHERE user_id = 'user_a'").fetchone()[0]
+        assert unpaid == ("pending", None), unpaid
+        assert balance_before_success == 70 - generation_credit_cost, balance_before_success
         status, _, _ = request(
             "POST",
             "/api/pay/notify/mpay",
@@ -1089,6 +1102,21 @@ def run() -> None:
         assert status == 400, status
         status, body, _ = request("GET", "/api/pay/orders/ORD-PAID", headers={"Cookie": cookie_b})
         assert status == 404, body
+
+        original_mpay_query_order = server.mpay_query_order
+        original_mpay_query_cashier_status = server.mpay_query_cashier_status
+        try:
+            server.mpay_query_order = lambda config, order_no: {"code": 1, "status": "1", "trade_no": "T-PAYING"}  # noqa: ARG005
+            server.mpay_query_cashier_status = lambda config, provider_order_id: {"status": "1"}  # noqa: ARG005
+            status, paying_body, _ = request("GET", "/api/pay/orders/ORD-MPAY-PAYING", headers={"Cookie": cookie_a})
+        finally:
+            server.mpay_query_order = original_mpay_query_order
+            server.mpay_query_cashier_status = original_mpay_query_cashier_status
+        assert status == 200, paying_body
+        assert paying_body["item"]["status"] == "pending", paying_body
+        with sqlite3.connect(DB_PATH) as conn:
+            credits = conn.execute("SELECT COUNT(*) FROM credit_ledger WHERE reference_type='order' AND reference_id='order_mpay_paying'").fetchone()[0]
+        assert credits == 0, credits
 
         params["sign"] = mpay_sign(params, "secret")
         query = urllib.parse.urlencode(params)
