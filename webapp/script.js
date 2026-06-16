@@ -3924,6 +3924,12 @@ function selectMethod(method, target) {
     document.querySelectorAll(".payment-method").forEach(item => item.classList.remove("active"));
     target?.classList.add("active");
     paymentState.channel = method === "alipay" ? "alipay" : "wechat";
+    if (!isAutoPaymentEnabled()) {
+        renderPaymentResult({ displayMode: "placeholder", message: manualPaymentMessage() });
+        const action = document.getElementById("paymentAction");
+        if (action) action.textContent = "联系客服开通";
+        return;
+    }
 
     const hint = document.getElementById("qrcodeHint");
     const hintMap = {
