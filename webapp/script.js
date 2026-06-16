@@ -989,6 +989,107 @@ function buildTemplateSpecificPlaceholder(template = {}, useCase = {}, params = 
     return `${labelHint}${useCase.placeholder || "例如：把主体、场景、颜色、文字和风格改成你自己的要求；没有特别说明的部分会沿用当前模板。"}${title ? ` 当前模板是「${title}」，尽量保留它的构图和质感。` : ""}`;
 }
 
+function detectTemplateUseCase(text = "", template = {}) {
+    const category = String(template.categoryLabel || template.category || template.sourceCase?.category || "").toLowerCase();
+    const haystack = [
+        text,
+        getLocalized(template.title),
+        getLocalized(template.description),
+        template.promptTemplate,
+        template.sourceCase?.promptPreview,
+        category,
+        ...(Array.isArray(template.tags) ? template.tags : []),
+        ...(Array.isArray(template.scenes) ? template.scenes : [])
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    const has = patterns => patterns.some(pattern => pattern.test(haystack));
+    const cat = patterns => patterns.some(pattern => pattern.test(category));
+
+    const definitions = {
+        pet: {
+            id: "pet",
+            summary: "这个模板适合做宠物头像、宠物写真或萌宠周边图。重点修改宠物种类、外观特征、表情动作、背景和画面风格。",
+            targets: ["宠物种类", "外观特征", "表情动作", "背景", "风格"],
+            tags: ["宠物", "萌系", "头像", "周边图"],
+            placeholder: "例如：宠物改成一只银渐层猫，圆脸大眼睛，戴红色围巾，名字写「糯米」，背景是冬天窗边，整体温暖可爱。"
+        },
+        portrait: {
+            id: "portrait",
+            summary: "这个模板适合做人像写真、头像、角色设定或人物海报。重点修改人物身份、服装造型、表情动作、拍摄环境和整体影调。",
+            targets: ["人物身份", "服装造型", "表情动作", "拍摄环境", "影调风格"],
+            tags: ["人像写真", "头像", "人物海报", "摄影与写实"],
+            placeholder: "例如：人物改成 28 岁咖啡店主理人，穿米色风衣，自然微笑，背景是上海街边咖啡馆，整体温暖写实。"
+        },
+        poster: {
+            id: "poster",
+            summary: "这个模板适合做海报、封面、活动主视觉或社媒配图。重点修改标题文字、活动主题、核心视觉元素、配色和版式比例。",
+            targets: ["标题文字", "活动主题", "核心元素", "配色", "版式比例"],
+            tags: ["海报", "封面", "活动主视觉", "字体排版"],
+            placeholder: "例如：做一张夏季新品发布海报，标题是「清爽一夏」，主色蓝白，加入冰块、水花和产品瓶，适合 4:5 社媒封面。"
+        },
+        product: {
+            id: "product",
+            summary: "这个模板适合做商品主图、详情页视觉或商业广告图。重点修改商品主体、卖点文案、背景场景、材质质感和主色调。",
+            targets: ["商品主体", "卖点文案", "背景场景", "材质质感", "主色调"],
+            tags: ["商品图", "电商主图", "商业广告", "质感表现"],
+            placeholder: "例如：商品改成一瓶蓝色精华液，背景是浅灰高端浴室台面，突出补水和清透质感，画面更适合小红书封面。"
+        },
+        brand: {
+            id: "brand",
+            summary: "这个模板适合做品牌视觉、Logo 延展、吉祥物或整套视觉触点。重点修改品牌名、行业属性、符号元素、品牌色和应用场景。",
+            targets: ["品牌名", "行业属性", "符号元素", "品牌色", "应用场景"],
+            tags: ["品牌设计", "Logo", "视觉系统", "吉祥物"],
+            placeholder: "例如：品牌名改成「云野茶室」，行业是新中式茶饮，加入云朵和茶叶符号，主色墨绿和米白，整体高级安静。"
+        },
+        ui: {
+            id: "ui",
+            summary: "这个模板适合生成应用界面、网页视觉、仪表盘或产品 UI 展示。重点修改产品类型、页面模块、核心数据、品牌色和设备场景。",
+            targets: ["产品类型", "页面模块", "核心数据", "品牌色", "设备场景"],
+            tags: ["UI 界面", "应用展示", "网页视觉", "产品原型"],
+            placeholder: "例如：产品改成健身教练预约 App，页面包含课程卡片、日历、会员数据和预约按钮，主色用黑白加荧光绿。"
+        },
+        space: {
+            id: "space",
+            summary: "这个模板适合做建筑空间、室内设计、门店场景或家居氛围图。重点修改空间类型、功能区域、材质、灯光和陈设。",
+            targets: ["空间类型", "功能区域", "材质", "灯光", "陈设风格"],
+            tags: ["建筑空间", "室内设计", "场景氛围", "材质灯光"],
+            placeholder: "例如：空间改成 40 平米社区咖啡店，加入吧台、两人座、木质墙面和暖色吊灯，整体安静自然。"
+        },
+        illustration: {
+            id: "illustration",
+            summary: "这个模板适合做插画、艺术风格图、绘本感画面或创意视觉。重点修改主题主体、画面情绪、绘画材质、色彩和构图。",
+            targets: ["主题主体", "画面情绪", "绘画材质", "色彩", "构图"],
+            tags: ["插画", "艺术风格", "绘本感", "创意视觉"],
+            placeholder: "例如：主题改成雨后城市里的女孩和透明伞，色彩偏蓝紫，画面安静、湿润、有电影感。"
+        },
+        general: {
+            id: "general",
+            summary: "这个模板已经固定了基础构图和画面质感。重点修改主体、场景、颜色、文字和风格要求即可。",
+            targets: ["主体内容", "场景背景", "文字内容", "颜色氛围", "风格质感"],
+            tags: ["通用模板", "可改主体", "可改场景", "可改风格"],
+            placeholder: "例如：把主体、场景、颜色、文字和风格改成你自己的要求；没有特别说明的部分会沿用当前模板。"
+        }
+    };
+
+    const petSignal = has([/宠物|萌宠|猫|狗|puppy|kitten|\bcat\b|\bdog\b|\bpet\b|animal/]);
+    const peopleSignal = cat([/characters|people|人物|角色|photography|realism|摄影|写实/]) || has([/人像|头像|肖像|写真|人物|portrait|headshot|character|girl|boy|woman|man|model/]);
+    if (petSignal && !peopleSignal) return definitions.pet;
+    if (cat([/characters|people|人物|角色|photography|realism|摄影|写实/]) || has([/人像|头像|肖像|写真|人物|portrait|headshot|character|girl|boy|woman|man|model/])) return definitions.portrait;
+    if (cat([/poster|typography|海报|字体/]) || has([/海报|封面|主视觉|标题|poster|flyer|cover|banner|typography|headline/])) return definitions.poster;
+    if (cat([/products|commerce|产品|电商/]) || has([/商品|产品|电商|主图|详情页|product|e-?commerce|commercial|skincare|cosmetic|food photography/])) return definitions.product;
+    if (cat([/brand|logo|品牌|标志/]) || has([/品牌|标志|logo|brand|identity|mascot|visual system/])) return definitions.brand;
+    if (cat([/ui|interfaces|界面/]) || has([/界面|应用|网页|仪表盘|后台|ui|interface|app|dashboard|website/])) return definitions.ui;
+    if (cat([/architecture|spaces|建筑|空间/]) || has([/建筑|空间|室内|房间|家居|店面|architecture|interior|room|home|storefront/])) return definitions.space;
+    if (cat([/illustration|art|插画|艺术/]) || has([/插画|绘画|艺术|watercolor|painting|illustration|art/])) return definitions.illustration;
+    return definitions.general;
+}
+
+function buildTemplateSpecificPlaceholder(template = {}, useCase = {}, params = []) {
+    const labels = templateParamLabels(params, 4);
+    const labelHint = labels.length ? `左侧先改「${labels.join("」「")}」；` : "";
+    return `${labelHint}${useCase.placeholder || "例如：把主体、场景、颜色、文字和风格改成你自己的要求；没有特别说明的部分会沿用当前模板。"}`;
+}
+
 function renderTemplatePromptGuide(template, prompt) {
     const target = document.getElementById("templatePromptGuide");
     if (!target) return;
