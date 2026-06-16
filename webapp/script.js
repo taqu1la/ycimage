@@ -4028,6 +4028,11 @@ function renderPaymentResult(payment) {
 }
 
 async function submitPaymentOrder() {
+    if (paymentState.planId && !isAutoPaymentEnabled()) {
+        renderPaymentResult({ displayMode: "placeholder", message: manualPaymentMessage() });
+        showToast(manualPaymentMessage());
+        return;
+    }
     if (!currentAccount?.authenticated) {
         await refreshAccountState();
     }
@@ -4038,11 +4043,6 @@ async function submitPaymentOrder() {
         return;
     }
     if (!paymentState.planId) return;
-    if (!isAutoPaymentEnabled()) {
-        renderPaymentResult({ displayMode: "placeholder", message: manualPaymentMessage() });
-        showToast(manualPaymentMessage());
-        return;
-    }
     setPaymentBusy(true);
     try {
         const data = await apiPost("/api/pay/orders", {
