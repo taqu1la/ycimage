@@ -132,7 +132,7 @@ const PAYMENT_CHANNEL_PLACEHOLDER_IMAGES = {
     wechat: "assets/payment-wechat-qr.jpg",
     alipay: "assets/payment-alipay-qr.jpg"
 };
-const POPULAR_TEMPLATE_LIMIT = 30;
+const POPULAR_TEMPLATE_LIMIT = 12;
 const HOME_CATEGORY_LIMIT = 6;
 let activeHomeCategoryFilter = "all";
 const CATEGORY_LABELS = {
@@ -342,8 +342,8 @@ function safeLinkUrl(path) {
     return "";
 }
 
-async function apiGet(path) {
-    const response = await apiFetch(path, "GET");
+async function apiGet(path, extra = {}) {
+    const response = await apiFetch(path, "GET", extra);
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const error = new Error(errorData.message || errorData.error || `HTTP ${response.status}`);
@@ -438,8 +438,8 @@ async function ensureTemplateData() {
     if (templateDataPromise) return templateDataPromise;
     templateDataPromise = (async () => {
         const [settingsData, templateData] = await Promise.all([
-            apiGet("/api/settings/public"),
-            apiGet(`/api/templates?featured=1&page_size=${POPULAR_TEMPLATE_LIMIT}&include_params=1&sort=featured`)
+            apiGet("/api/settings/public", { cache: "default" }),
+            apiGet(`/api/templates?featured=1&page_size=${POPULAR_TEMPLATE_LIMIT}&include_params=1&sort=featured`, { cache: "default" })
         ]);
         publicSettings = settingsData.settings || {};
         publicSettings.pricingPlans = settingsData.pricingPlans || publicSettings.pricingPlans || [];
@@ -1643,7 +1643,7 @@ function populateCustomImageModels() {
     const models = getImageModels();
     const current = select.value || getPreferredImageModelId();
     if (!models.length) {
-        select.innerHTML = `<option value="${escapeAttr(DEFAULT_IMAGE_MODEL)}">GPT-Image2 高清</option>`;
+        select.innerHTML = `<option value="${escapeAttr(DEFAULT_IMAGE_MODEL)}">高清图像模型</option>`;
         select.value = DEFAULT_IMAGE_MODEL;
         return;
     }
@@ -1714,7 +1714,7 @@ function updateCustomImageOfficialOptions() {
 
     if (hint) {
         hint.textContent = isOfficial
-            ? "当前为 GPT Image 2 Official：支持 Auto 比例、输出格式、背景、审核强度和压缩强度；official 路由不支持透明背景。"
+            ? "当前为官方高清链路：支持 Auto 比例、输出格式、背景、审核强度和压缩强度；该链路不支持透明背景。"
             : "当前为默认高清链路：主要使用模型、质量、尺寸、数量和参考图；高级输出参数会保持默认。";
     }
     if (meta) {
@@ -3062,7 +3062,7 @@ async function loadVideoTemplates() {
     if (!grid) return;
     grid.innerHTML = `<div class="video-template-empty">正在读取视频模板</div>`;
     try {
-        const data = await apiGet("/api/templates?modality=video&page_size=8&include_params=1&sort=featured");
+        const data = await apiGet("/api/templates?modality=video&page_size=8&include_params=1&sort=featured", { cache: "default" });
         videoTemplates = data.items || [];
         renderVideoTemplates();
     } catch (error) {

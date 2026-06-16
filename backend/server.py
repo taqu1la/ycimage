@@ -1261,7 +1261,7 @@ def ensure_apimart_official_route(conn: sqlite3.Connection) -> None:
             credit_cost, priority, timeout_seconds, retry_limit, success_rate, avg_latency_ms, status, metadata_json
         )
         VALUES (
-            'route_gpt_image_2_official', 'provider_apimart', ?, 'GPT Image 2 Official',
+            'route_gpt_image_2_official', 'provider_apimart', ?, '官方高清链路',
             ?, 'image', 'high', ?, ?, '1:1', '1:1',
             15, 70, 120, 2, 97.8, 18600, 'active', ?
         )
@@ -2930,6 +2930,15 @@ def serialize_template(conn: sqlite3.Connection, row: sqlite3.Row, include_param
 
     param_count = data.get("param_count")
     params = load_template_params(conn, data["id"]) if include_params else []
+    prompt_template = data.get("prompt_template") or ""
+    description = data.get("description") or ""
+    if not include_params:
+        prompt_template = ""
+        if len(description) > 180:
+            description = f"{description[:177]}..."
+        if source_case:
+            source_case = {**source_case}
+            source_case.pop("promptPreview", None)
     if include_params:
         param_count = len(params)
 
@@ -2943,7 +2952,7 @@ def serialize_template(conn: sqlite3.Connection, row: sqlite3.Row, include_param
         "sourceTemplateId": data.get("source_template_id"),
         "caseId": data.get("case_id"),
         "title": data["title"],
-        "description": data.get("description") or "",
+        "description": description,
         "category": category,
         "categoryLabel": data.get("category_label") or category or "Uncategorized",
         "cover": cover,
@@ -2970,7 +2979,7 @@ def serialize_template(conn: sqlite3.Connection, row: sqlite3.Row, include_param
         "conversionRate": data.get("conversion_rate") or 0,
         "paramCount": param_count or 0,
         "params": params,
-        "promptTemplate": data.get("prompt_template") or "",
+        "promptTemplate": prompt_template,
         "source": "repo" if source_type == "repo" else "custom",
         "sourceLabel": data.get("source_label") or ("GitHub templates" if source_type == "repo" else "Manual"),
         "sourceUrl": data.get("source_url") or "",

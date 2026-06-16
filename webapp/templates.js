@@ -1,6 +1,6 @@
 const state = {
     page: 1,
-    pageSize: 12,
+    pageSize: 8,
     category: "all",
     type: "all",
     query: "",
@@ -100,7 +100,7 @@ function isSafeDataImageUrl(value) {
 async function apiGet(path) {
     const response = await fetch(apiUrl(path), {
         credentials: "include",
-        cache: "no-store",
+        cache: "default",
         headers: { Accept: "application/json" }
     });
     if (!response.ok) {
