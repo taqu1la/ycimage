@@ -3771,6 +3771,17 @@ function updatePaymentTrustPill() {
     pill.textContent = "微信 / 支付宝扫码";
 }
 
+function isAutoPaymentEnabled() {
+    return Boolean(publicSettings.payment?.autoPayEnabled);
+}
+
+function manualPaymentMessage() {
+    const contact = String(publicSettings.payment?.serviceContact || "").trim();
+    return contact
+        ? `当前为人工开通模式。请扫码付款后联系 ${contact}，发送账号邮箱和开通方案。`
+        : "当前为人工开通模式。请扫码付款后联系客服，发送账号邮箱和开通方案。";
+}
+
 function normalizePlanCode(planId) {
     return PLAN_CODE_ALIASES_CLIENT[planId] || planId || "";
 }
@@ -3871,6 +3882,11 @@ function openPayment(planId) {
     renderPaymentResult({ displayMode: "placeholder", message: "创建订单后会显示 MPAY 扫码支付二维码；支付成功后通常会自动到账，如未到账可联系客服核验开通。" });
     const firstMethod = document.querySelector(".payment-method[data-method]");
     if (firstMethod) selectMethod(firstMethod.dataset.method || "wechat", firstMethod);
+    if (!isAutoPaymentEnabled()) {
+        renderPaymentResult({ displayMode: "placeholder", message: manualPaymentMessage() });
+        const action = document.getElementById("paymentAction");
+        if (action) action.textContent = "联系客服开通";
+    }
     const modal = document.getElementById("paymentModal");
     modal?.classList.add("active");
     modal?.setAttribute("aria-hidden", "false");
@@ -4016,6 +4032,11 @@ async function submitPaymentOrder() {
         return;
     }
     if (!paymentState.planId) return;
+    if (!isAutoPaymentEnabled()) {
+        renderPaymentResult({ displayMode: "placeholder", message: manualPaymentMessage() });
+        showToast(manualPaymentMessage());
+        return;
+    }
     setPaymentBusy(true);
     try {
         const data = await apiPost("/api/pay/orders", {
