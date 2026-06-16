@@ -1074,13 +1074,19 @@ function detectTemplateUseCase(text = "", template = {}) {
     const petSignal = has([/宠物|萌宠|猫|狗|puppy|kitten|\bcat\b|\bdog\b|\bpet\b|animal/]);
     const peopleSignal = cat([/characters|people|人物|角色|photography|realism|摄影|写实/]) || has([/人像|头像|肖像|写真|人物|portrait|headshot|character|girl|boy|woman|man|model/]);
     if (petSignal && !peopleSignal) return definitions.pet;
+    if (cat([/poster|typography|海报|字体/])) return definitions.poster;
+    if (cat([/products|commerce|产品|电商/])) return definitions.product;
+    if (cat([/brand|logo|品牌|标志/])) return definitions.brand;
+    if (cat([/ui|interfaces|界面/])) return definitions.ui;
+    if (cat([/architecture|spaces|建筑|空间/])) return definitions.space;
+    if (cat([/illustration|art|插画|艺术/])) return definitions.illustration;
     if (cat([/characters|people|人物|角色|photography|realism|摄影|写实/]) || has([/人像|头像|肖像|写真|人物|portrait|headshot|character|girl|boy|woman|man|model/])) return definitions.portrait;
-    if (cat([/poster|typography|海报|字体/]) || has([/海报|封面|主视觉|标题|poster|flyer|cover|banner|typography|headline/])) return definitions.poster;
-    if (cat([/products|commerce|产品|电商/]) || has([/商品|产品|电商|主图|详情页|product|e-?commerce|commercial|skincare|cosmetic|food photography/])) return definitions.product;
-    if (cat([/brand|logo|品牌|标志/]) || has([/品牌|标志|logo|brand|identity|mascot|visual system/])) return definitions.brand;
-    if (cat([/ui|interfaces|界面/]) || has([/界面|应用|网页|仪表盘|后台|ui|interface|app|dashboard|website/])) return definitions.ui;
-    if (cat([/architecture|spaces|建筑|空间/]) || has([/建筑|空间|室内|房间|家居|店面|architecture|interior|room|home|storefront/])) return definitions.space;
-    if (cat([/illustration|art|插画|艺术/]) || has([/插画|绘画|艺术|watercolor|painting|illustration|art/])) return definitions.illustration;
+    if (has([/海报|封面|主视觉|标题|poster|flyer|cover|banner|typography|headline/])) return definitions.poster;
+    if (has([/商品|产品|电商|主图|详情页|product|e-?commerce|commercial|skincare|cosmetic|food photography/])) return definitions.product;
+    if (has([/品牌|标志|logo|brand|identity|mascot|visual system/])) return definitions.brand;
+    if (has([/界面|应用|网页|仪表盘|后台|ui|interface|app|dashboard|website/])) return definitions.ui;
+    if (has([/建筑|空间|室内|房间|家居|店面|architecture|interior|room|home|storefront/])) return definitions.space;
+    if (has([/插画|绘画|艺术|watercolor|painting|illustration|art/])) return definitions.illustration;
     return definitions.general;
 }
 
