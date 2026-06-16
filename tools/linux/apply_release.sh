@@ -16,6 +16,7 @@ SERVICE_FILE="/etc/systemd/system/ycimage.service"
 NGINX_CONF_D="/etc/nginx/conf.d"
 NGINX_SITES_AVAILABLE="/etc/nginx/sites-available"
 NGINX_SITES_ENABLED="/etc/nginx/sites-enabled"
+NGINX_ASSET_CACHE_DIR="${YCIMAGE_NGINX_ASSET_CACHE_DIR:-/var/cache/nginx/ycimage_assets}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   install -d -o root -g root "$CONF_DIR"
@@ -70,6 +71,14 @@ install -d -o "$APP_USER" -g "$APP_GROUP" "$LOG_DIR"
 chown -R "$APP_USER:$APP_GROUP" "$APP_ROOT"
 chown -R "$APP_USER:$APP_GROUP" "$STATE_ROOT"
 chown -R "$APP_USER:$APP_GROUP" "$LOG_DIR"
+
+install -d -o root -g root "$NGINX_ASSET_CACHE_DIR"
+if [[ -f /etc/nginx/nginx.conf ]]; then
+  NGINX_RUN_USER="$(awk '/^[[:space:]]*user[[:space:]]+/ {gsub(";", "", $2); print $2; exit}' /etc/nginx/nginx.conf || true)"
+  if [[ -n "${NGINX_RUN_USER:-}" ]] && id "$NGINX_RUN_USER" >/dev/null 2>&1; then
+    chown -R "$NGINX_RUN_USER:$NGINX_RUN_USER" "$NGINX_ASSET_CACHE_DIR" || true
+  fi
+fi
 
 if [[ ! -f "$YCIMAGE_DB_PATH" ]]; then
   if [[ -n "$YCIMAGE_SEED_DB_PATH" ]]; then

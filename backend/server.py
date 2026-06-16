@@ -5533,6 +5533,8 @@ class AppHandler(BaseHTTPRequestHandler):
 
     def send_json(self, status: int, payload: dict | list, extra_headers: dict[str, str] | None = None) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        headers_to_send = dict(extra_headers or {})
+        cache_control = headers_to_send.pop("Cache-Control", "no-store")
         self.send_response(status)
         self.send_security_headers()
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -5541,9 +5543,10 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_header("Access-Control-Allow-Origin", cors_origin)
             self.send_header("Vary", "Origin")
             self.send_header("Access-Control-Allow-Credentials", "true")
-        self.send_header("Cache-Control", "no-store")
-        headers_to_send = self.maybe_refresh_csrf_cookie_headers()
-        headers_to_send.update(extra_headers or {})
+        self.send_header("Cache-Control", cache_control)
+        refreshed_cookie_headers = self.maybe_refresh_csrf_cookie_headers()
+        refreshed_cookie_headers.update(headers_to_send)
+        headers_to_send = refreshed_cookie_headers
         for key, value in headers_to_send.items():
             header_name = "Set-Cookie" if key.lower().startswith("set-cookie") else key
             self.send_header(header_name, value)
@@ -5644,6 +5647,7 @@ class AppHandler(BaseHTTPRequestHandler):
                         "apiEndpoint": "/api/generate-image",
                         "pricingPlans": list_active_pricing_plans(conn),
                     },
+                    {"Cache-Control": "public, max-age=60, stale-while-revalidate=300"},
                 )
                 return
 
@@ -6280,7 +6284,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 return
 
             if method == "GET" and path == "/api/categories":
-                self.send_json(200, {"items": list_categories(conn)})
+                self.send_json(200, {"items": list_categories(conn)}, {"Cache-Control": "public, max-age=300"})
                 return
 
             if method == "GET" and path == "/api/templates":
@@ -6289,7 +6293,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 result["categories"] = list_categories(conn)
                 result["settings"] = app_settings(conn)
                 result["settings"]["payment"] = public_payment_settings(conn)
-                self.send_json(200, result)
+                self.send_json(200, result, {"Cache-Control": "public, max-age=60, stale-while-revalidate=300"})
                 return
 
             if method == "GET" and path.startswith("/api/templates/"):
@@ -6322,7 +6326,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 if not user_can_access_asset(conn, session_user, row):
                     self.send_json(403, {"error": "Forbidden", "message": "Access denied"})
                     return
-                self.send_binary(200, row["content"], row["mime_type"] or "application/octet-stream")
+                cache_header = "public, max-age=604800" if asset_is_public(row) else "private, max-age=86400"
+                self.send_binary(200, row["content"], row["mime_type"] or "application/octet-stream", cache_header)
                 return
 
             if method == "GET" and path.startswith("/api/jobs/"):
